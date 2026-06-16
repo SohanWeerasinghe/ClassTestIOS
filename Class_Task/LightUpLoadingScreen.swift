@@ -380,15 +380,20 @@ class LightUpGameManager: ObservableObject {
     }
     
     private func handlePenalty() {
-        if lives > 1 {
-            lives -= 1
-            playHealthLoseSound()
-        } else {
-            lives = 0
-            endGame()
-            playGameOverSound()
+            // Trigger a heavy physical haptic pulse on the phone engine
+            let generator = UIImpactFeedbackGenerator(style: .heavy)
+            generator.prepare()
+            generator.impactOccurred()
+            
+            if lives > 1 {
+                lives -= 1
+                playHealthLoseSound()
+            } else {
+                lives = 0
+                endGame()
+                playGameOverSound()
+            }
         }
-    }
     
     private func endGame() {
         isGameOver = true
