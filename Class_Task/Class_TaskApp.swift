@@ -11,7 +11,7 @@ import SwiftUI
 struct Class_TaskApp: App {
     var body: some Scene {
         WindowGroup {
-            LoadingScreen()
+            Homepage()
         }
     }
 }

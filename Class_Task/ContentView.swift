@@ -23,6 +23,7 @@ struct ContentView: View {
     @State private var hasTappedThisSecond: Bool = false
     
     @State private var audioPlayer: AVAudioPlayer?
+    @AppStorage("tapMeHighScore") private var tapMeHighScore: Int = 0
     
     let colorPalette: [Color] = [.red, .green, .yellow, .pink, .blue, .purple, .orange, .cyan]
     let gameTimer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
@@ -41,6 +42,7 @@ struct ContentView: View {
             
             VStack(spacing: 0) {
                 
+                // EXIT GAME NAVIGATION BAR
                 HStack {
                     Button(action: {
                         dismiss()
@@ -62,6 +64,8 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 15)
+                
+                // INTERFACE TEXT AND LABELS
                 VStack(spacing: 20) {
                     
                     Spacer().frame(height: 10)
@@ -88,6 +92,7 @@ struct ContentView: View {
                     
                     Spacer()
                     
+                    // INTERACTIVE GAMEPLAY TRIGGER
                     if isGameOver {
                         Button(action: {
                             resetGame()
@@ -106,7 +111,7 @@ struct ContentView: View {
                         Button(action: {
                             handleTargetTap()
                         }) {
-                            Image(<#T##resource: ImageResource##ImageResource#>, )
+                            Circle()
                                 .foregroundColor(currentColor)
                                 .frame(width: 140, height: 140)
                                 .shadow(radius: 10)
@@ -121,7 +126,7 @@ struct ContentView: View {
             updateGameTick()
         }
     }
-    
+        
     func handleTargetTap() {
         if let randomColor = colorPalette.randomElement() {
             currentColor = randomColor
@@ -150,6 +155,10 @@ struct ContentView: View {
                 timeRemaining -= 1
             } else {
                 isGameOver = true
+                // Persist score if it breaks the record
+                if score > tapMeHighScore {
+                    tapMeHighScore = score
+                }
                 playGameOverSound()
             }
         }
