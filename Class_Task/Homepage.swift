@@ -43,7 +43,7 @@ struct Homepage: View {
                             GameMenuCard(title: "Tap Me!",
                                          subtitle: "Test your speed clicking skills",
                                          icon: "hand.tap.fill",
-                                         color: .orange) // Fixed: changed Color.orange to color: .orange
+                                         color: .orange)
                         }
                         
                         NavigationLink(destination: LightUpLoadingScreen()) {
@@ -51,6 +51,15 @@ struct Homepage: View {
                                          subtitle: "Your brilliant next project",
                                          icon: "inset.filled.square",
                                          color: .green)
+                        }
+            
+                        NavigationLink(destination: QuizRushView()) {
+                            GameMenuCard(
+                                title: "Quiz Rush",
+                                subtitle: "Challenge your mind with live trivia!",
+                                icon: "brain.head.profile",
+                                color: .purple
+                            )
                         }
                     }
                     .padding(.horizontal, 25)
