@@ -1,22 +1,18 @@
-//
-//  QuizRushView.swift
-//  Class_Task
-//
-//  Created by Sohan Weerasinghe on 3/7/2026.
-//
-
 import SwiftUI
 
 struct QuizRushView: View {
     @StateObject private var viewModel = QuizRushViewModel()
     @AppStorage("quizRushHighScore") private var highScore: Int = 0
     
+    // Track selection states for highlighting
+    @State private var selectedAnswer: String? = nil
+    @State private var hasSubmitted: Bool = false
+    
     var body: some View {
         ZStack {
             Color(.systemGroupedBackground)
                 .ignoresSafeArea()
             
-            // Background feedback flash overlay panel
             viewModel.feedbackColor
                 .ignoresSafeArea()
                 .animation(.easeInOut, value: viewModel.feedbackColor)
@@ -79,7 +75,6 @@ struct QuizRushView: View {
                     }
                     .padding()
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
                     .cornerRadius(14)
                     .padding(.horizontal)
                     
@@ -102,25 +97,37 @@ struct QuizRushView: View {
                     
                     Spacer()
                     
-                    // The 4 Shuffled Quiz Answer Option Buttons
+                    // Shuffled Quiz Answer Option Buttons with Conditional Highlighting
                     VStack(spacing: 12) {
                         ForEach(viewModel.currentAnswers, id: \.self) { answer in
+                            let isCorrectAnswer = (answer == viewModel.questions[viewModel.currentIndex].correctAnswer)
+                            let isThisButtonSelected = (answer == selectedAnswer)
+                            
                             Button(action: {
+                                guard !hasSubmitted else { return }
+                                selectedAnswer = answer
+                                hasSubmitted = true
                                 viewModel.submitAnswer(answer)
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                    selectedAnswer = nil
+                                    hasSubmitted = false
+                                }
                             }) {
                                 Text(answer.decodedHTML)
                                     .font(.body)
                                     .bold()
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(buttonTextColor(isCorrect: isCorrectAnswer, isSelected: isThisButtonSelected))
                                     .padding()
                                     .frame(maxWidth: .infinity)
-                                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                                    .background(buttonBackgroundColor(isCorrect: isCorrectAnswer, isSelected: isThisButtonSelected))
                                     .cornerRadius(12)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                                            .stroke(buttonBorderColor(isCorrect: isCorrectAnswer, isSelected: isThisButtonSelected), lineWidth: 2)
                                     )
                             }
+                            .disabled(hasSubmitted)
                         }
                     }
                     .padding(.horizontal)
@@ -180,5 +187,29 @@ struct QuizRushView: View {
         .task {
             await viewModel.fetchQuestions()
         }
+    }
+        
+    private func buttonBackgroundColor(isCorrect: Bool, isSelected: Bool) -> Color {
+        guard hasSubmitted else { return Color(uiColor: .secondarySystemGroupedBackground) }
+        if isCorrect {
+            return Color.green.opacity(0.2) // Always turn the correct answer green
+        } else if isSelected {
+            return Color.red.opacity(0.2) // Turn the wrong chosen option red
+        }
+        return Color(uiColor: .secondarySystemGroupedBackground)
+    }
+    
+    private func buttonTextColor(isCorrect: Bool, isSelected: Bool) -> Color {
+        guard hasSubmitted else { return .primary }
+        if isCorrect { return .green }
+        if isSelected { return .red }
+        return .secondary
+    }
+    
+    private func buttonBorderColor(isCorrect: Bool, isSelected: Bool) -> Color {
+        guard hasSubmitted else { return Color.gray.opacity(0.2) }
+        if isCorrect { return .green }
+        if isSelected { return .red }
+        return Color.gray.opacity(0.1)
     }
 }

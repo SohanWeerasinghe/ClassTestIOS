@@ -26,14 +26,25 @@ struct Question: Codable, Identifiable {
 
 extension String {
     var decodedHTML: String {
-        guard let data = self.data(using: .utf8) else { return self }
-        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
-            .documentType: NSAttributedString.DocumentType.html,
-            .characterEncoding: String.Encoding.utf8.rawValue
+        var text = self
+        // Map of common HTML entities returned by Open Trivia DB
+        let entities = [
+            "&quot;": "\"",
+            "&#039;": "'",
+            "&amp;": "&",
+            "&lt;": "<",
+            "&gt;": ">",
+            "&rsquo;": "'",
+            "&lsquo;": "'",
+            "&ldquo;": "\"",
+            "&rdquo;": "\"",
+            "&deg;": "°"
         ]
-        if let attributedString = try? NSAttributedString(data: data, options: options, documentAttributes: nil) {
-            return attributedString.string
+        
+        for (entity, replacement) in entities {
+            text = text.replacingOccurrences(of: entity, with: replacement)
         }
-        return self
+        
+        return text
     }
 }

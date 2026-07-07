@@ -10,15 +10,16 @@ enum GameModeFilter: String, CaseIterable, Identifiable {
     case all = "All Games"
     case tapMe = "Tap Me!"
     case lightItUp = "Light It Up"
+    case quizRush = "Quiz Rush" // 1. Added Quiz Rush to filter case options
     
     var id: String { self.rawValue }
 }
 
 struct LeaderboardView: View {
     // Read the persisted high scores directly from device storage
-    // These keys match the @AppStorage keys used inside your games
-    @AppStorage("tapMeHighScore") private var tapMeHighScore: Int = 0 // Make sure this matches your Week 1 key if different
+    @AppStorage("tapMeHighScore") private var tapMeHighScore: Int = 0
     @AppStorage("lightUpHighScore") private var lightUpHighScore: Int = 0
+    @AppStorage("quizRushHighScore") private var quizRushHighScore: Int = 0 // 2. Stored high score reference pointer
     
     @State private var selectedFilter: GameModeFilter = .all
     
@@ -57,6 +58,16 @@ struct LeaderboardView: View {
                                 highScore: lightUpHighScore,
                                 icon: "gamecontroller.fill",
                                 themeColor: .green
+                            )
+                        }
+                        
+                        // 3. Conditional block displaying Quiz Rush card
+                        if selectedFilter == .all || selectedFilter == .quizRush {
+                            LeaderboardCard(
+                                gameTitle: "Quiz Rush",
+                                highScore: quizRushHighScore,
+                                icon: "brain.head.profile",
+                                themeColor: .purple
                             )
                         }
                     }
