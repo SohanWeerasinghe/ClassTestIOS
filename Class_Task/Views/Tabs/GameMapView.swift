@@ -7,10 +7,14 @@ struct GameMapView: View {
     
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 6.9271, longitude: 79.8612),
-            span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)
+            center: CLLocationCoordinate2D(latitude: 20.0, longitude: 0.0),
+            span: MKCoordinateSpan(latitudeDelta: 80.0, longitudeDelta: 80.0)
         )
     )
+    
+    private var pinnedSessions: [GameSession] {
+        sessionStore.sessions.filter { $0.accuracy > 0 }
+    }
     
     var body: some View {
         ZStack {
@@ -33,9 +37,11 @@ struct GameMapView: View {
                 .padding(.top, 30)
                 
                 Map(position: $cameraPosition) {
-                    UserAnnotation()
+                    if locationService.isLocationAllowed {
+                        UserAnnotation()
+                    }
                     
-                    ForEach(sessionStore.sessions) { session in
+                    ForEach(pinnedSessions) { session in
                         Marker(
                             "\(session.gameName) - \(session.score) pts",
                             coordinate: CLLocationCoordinate2D(
@@ -47,7 +53,9 @@ struct GameMapView: View {
                     }
                 }
                 .mapControls {
-                    MapUserLocationButton()
+                    if locationService.isLocationAllowed {
+                        MapUserLocationButton()
+                    }
                     MapCompass()
                 }
                 .frame(height: 300)
@@ -55,9 +63,26 @@ struct GameMapView: View {
                 .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
                 .padding(.horizontal, 25)
                 
-                Text(locationService.permissionText)
-                    .font(.caption)
-                    .foregroundColor(.black)
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(locationService.permissionText)
+                            .font(.caption)
+                            .foregroundColor(.black)
+                        
+                        Text(locationService.accuracyText)
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
+                    
+                    if !sessionStore.sessions.isEmpty {
+                        Button("Clear History") {
+                            sessionStore.clearSessions()
+                        }
+                        .font(.caption)
+                        .bold()
+                        .foregroundColor(.purple)
+                    }
+                }
                 
                 if sessionStore.sessions.isEmpty {
                     Text("Finish a game to add a pin to the map.")
@@ -70,6 +95,18 @@ struct GameMapView: View {
                         .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
                         .padding(.horizontal, 25)
                 } else {
+                    if pinnedSessions.isEmpty {
+                        Text("Saved games need location permission before they can appear as map pins.")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.white)
+                            .cornerRadius(18)
+                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+                            .padding(.horizontal, 25)
+                    }
+                    
                     ScrollView {
                         VStack(spacing: 12) {
                             ForEach(sessionStore.sessions.reversed()) { session in
@@ -87,20 +124,35 @@ struct GameMapView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             locationService.requestLocation()
-            moveMapToCurrentLocation()
+            moveMapToBestLocation()
         }
         .onChange(of: locationService.currentLocation) {
-            moveMapToCurrentLocation()
+            moveMapToBestLocation()
+        }
+        .onChange(of: sessionStore.sessions.count) {
+            moveMapToBestLocation()
         }
     }
     
-    private func moveMapToCurrentLocation() {
-        guard let location = locationService.currentLocation else { return }
-        
+    private func moveMapToBestLocation() {
+        if let location = locationService.currentLocation,
+           location.horizontalAccuracy > 0,
+           location.horizontalAccuracy <= 100 {
+            setMapCenter(location.coordinate)
+        } else if let lastSession = pinnedSessions.last {
+            let coordinate = CLLocationCoordinate2D(
+                latitude: lastSession.latitude,
+                longitude: lastSession.longitude
+            )
+            setMapCenter(coordinate)
+        }
+    }
+    
+    private func setMapCenter(_ coordinate: CLLocationCoordinate2D) {
         cameraPosition = .region(
             MKCoordinateRegion(
-                center: location.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)
+                center: coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
             )
         )
     }
@@ -127,6 +179,16 @@ struct MapSessionCard: View {
                 Text(session.date.formatted(date: .abbreviated, time: .shortened))
                     .font(.caption)
                     .foregroundColor(.gray)
+                
+                if session.accuracy > 0 {
+                    Text("Accuracy about \(Int(session.accuracy))m")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                } else {
+                    Text("No map pin - location was not captured")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
             }
             
             Spacer()

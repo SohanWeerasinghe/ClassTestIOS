@@ -12,81 +12,112 @@ struct Homepage: View {
     @State private var backgroundMusicPlayer: AVAudioPlayer?
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Image("back2")
-                    .resizable()
-                    .ignoresSafeArea()
-                    .opacity(0.6)
-                
-                VStack(spacing: 35) {
-                    VStack(spacing: 8) {
-                        Text("Welcome to")
-                            .font(.system(size: 50, weight: .bold))
-                            .foregroundColor(.black)
-                            .fontDesign(.serif)
-                        Text("Game Arcade")
-                            .font(.system(size: 50, weight: .black))
-                            .foregroundColor(.black)
-                            .fontDesign(.serif)
+        TabView {
+            NavigationStack {
+                ZStack {
+                    Image("back2")
+                        .resizable()
+                        .ignoresSafeArea()
+                        .opacity(0.6)
+                    
+                    VStack(spacing: 35) {
+                        VStack(spacing: 8) {
+                            Text("Welcome to")
+                                .font(.system(size: 50, weight: .bold))
+                                .foregroundColor(.black)
+                                .fontDesign(.serif)
+                            Text("Game Arcade")
+                                .font(.system(size: 50, weight: .black))
+                                .foregroundColor(.black)
+                                .fontDesign(.serif)
+                            
+                            Text("Select a game to play")
+                                .font(.subheadline)
+                                .foregroundColor(.black)
+                        }
+                        .padding(.top, 40)
                         
-                        Text("Select a game to play")
-                            .font(.subheadline)
-                            .foregroundColor(.black)
-                    }
-                    .padding(.top, 40)
-                    
-                    Spacer()
-                    
-                    VStack(spacing: 20) {
-                        NavigationLink(destination: LoadingScreen()) {
-                            GameMenuCard(title: "Tap Me!",
-                                         subtitle: "Test your speed clicking skills",
-                                         icon: "hand.tap.fill",
-                                         color: .orange)
-                        }
+                        Spacer()
                         
-                        NavigationLink(destination: LightUpLoadingScreen()) {
-                            GameMenuCard(title: "Light It Up",
-                                         subtitle: "Your brilliant next project",
-                                         icon: "inset.filled.square",
-                                         color: .green)
-                        }
-            
-                        NavigationLink(destination: QuizRushView()) {
-                            GameMenuCard(
-                                title: "Quiz Rush",
-                                subtitle: "Challenge your mind with live trivia!",
-                                icon: "brain.head.profile",
-                                color: .purple
-                            )
-                        }
-                    }
-                    .padding(.horizontal, 25)
-                    
-                    Spacer()
-                }
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: LeaderboardView()) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "trophy.fill")
-                                Text("Scores")
+                        VStack(spacing: 20) {
+                            NavigationLink(destination: LoadingScreen()) {
+                                GameMenuCard(title: "Tap Me!",
+                                             subtitle: "Test your speed clicking skills",
+                                             icon: "hand.tap.fill",
+                                             color: .orange)
                             }
-                            .font(.subheadline)
-                            .bold()
-                            .foregroundColor(.orange)
+                            
+                            NavigationLink(destination: LightUpLoadingScreen()) {
+                                GameMenuCard(title: "Light It Up",
+                                             subtitle: "Your brilliant next project",
+                                             icon: "inset.filled.square",
+                                             color: .green)
+                            }
+                
+                            NavigationLink(destination: QuizRushView()) {
+                                GameMenuCard(
+                                    title: "Quiz Rush",
+                                    subtitle: "Challenge your mind with live trivia!",
+                                    icon: "brain.head.profile",
+                                    color: .purple
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 25)
+                        
+                        Spacer()
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            NavigationLink(destination: LeaderboardView()) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "trophy.fill")
+                                    Text("Scores")
+                                }
+                                .font(.subheadline)
+                                .bold()
+                                .foregroundColor(.orange)
+                            }
                         }
                     }
                 }
+                .onAppear {
+                    playBackgroundMusic()
+                }
+                .onDisappear {
+                    stopBackgroundMusic()
+                }
             }
-            .onAppear {
-                playBackgroundMusic()
+            .tabItem {
+                Image(systemName: "gamecontroller.fill")
+                Text("Home")
             }
-            .onDisappear {
-                stopBackgroundMusic()
+            
+            NavigationStack {
+                LeaderboardView()
+            }
+            .tabItem {
+                Image(systemName: "chart.bar.fill")
+                Text("Stats")
+            }
+            
+            NavigationStack {
+                GameMapView()
+            }
+            .tabItem {
+                Image(systemName: "map.fill")
+                Text("Map")
+            }
+            
+            NavigationStack {
+                SettingsView()
+            }
+            .tabItem {
+                Image(systemName: "gearshape.fill")
+                Text("Settings")
             }
         }
+        .tint(.purple)
     }
     
     
@@ -114,6 +145,31 @@ struct Homepage: View {
         if backgroundMusicPlayer?.isPlaying == true {
             backgroundMusicPlayer?.stop()
             backgroundMusicPlayer = nil
+        }
+    }
+}
+
+struct SimpleTabPage: View {
+    let title: String
+    let icon: String
+    
+    var body: some View {
+        ZStack {
+            Image("back2")
+                .resizable()
+                .ignoresSafeArea()
+                .opacity(0.6)
+            
+            VStack(spacing: 16) {
+                Image(systemName: icon)
+                    .font(.system(size: 50))
+                    .foregroundColor(.purple)
+                
+                Text(title)
+                    .font(.largeTitle)
+                    .bold()
+                    .foregroundColor(.black)
+            }
         }
     }
 }
