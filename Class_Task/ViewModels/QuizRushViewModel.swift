@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 
 enum QuizViewState {
+    case setup
     case loading
     case failed
     case loaded
@@ -20,22 +21,22 @@ class QuizRushViewModel: ObservableObject {
     @Published var currentIndex: Int = 0
     @Published var score: Int = 0
     @Published var streak: Int = 0
-    @Published var viewState: QuizViewState = .loading
+    @Published var viewState: QuizViewState = .setup
     @Published var currentAnswers: [String] = []
     
-    // Keeps track of the last answer's status for visual flashes/feedback
     @Published var feedbackColor: Color = .clear
     
-    /// Asynchronously fetches 10 multiple-choice trivia items
-    func fetchQuestions() async {
+    func fetchQuestions(category: QuizCategory, difficulty: QuizDifficulty) async {
         await MainActor.run {
             self.viewState = .loading
             self.currentIndex = 0
             self.score = 0
             self.streak = 0
+            self.questions = []
+            self.currentAnswers = []
         }
         
-        guard let url = URL(string: "https://opentdb.com/api.php?amount=10&type=multiple") else {
+        guard let url = questionURL(category: category, difficulty: difficulty) else {
             await MainActor.run { self.viewState = .failed }
             return
         }
@@ -61,7 +62,25 @@ class QuizRushViewModel: ObservableObject {
         }
     }
     
-    /// Combines and shuffles correct and incorrect options once per question
+    private func questionURL(category: QuizCategory, difficulty: QuizDifficulty) -> URL? {
+        var components = URLComponents(string: "https://opentdb.com/api.php")
+        var queryItems = [
+            URLQueryItem(name: "amount", value: "10"),
+            URLQueryItem(name: "type", value: "multiple")
+        ]
+        
+        if category != .any {
+            queryItems.append(URLQueryItem(name: "category", value: String(category.rawValue)))
+        }
+        
+        if difficulty != .any {
+            queryItems.append(URLQueryItem(name: "difficulty", value: difficulty.rawValue))
+        }
+        
+        components?.queryItems = queryItems
+        return components?.url
+    }
+    
     private func shuffleAnswersForCurrentQuestion() {
         guard currentIndex < questions.count else { return }
         let currentQuestion = questions[currentIndex]
@@ -70,7 +89,6 @@ class QuizRushViewModel: ObservableObject {
         self.currentAnswers = choices.shuffled()
     }
     
-    /// Valdiates user selections, adjusts game metrics, and pushes view states
     func submitAnswer(_ selectedAnswer: String) {
         guard currentIndex < questions.count else { return }
         
@@ -78,7 +96,6 @@ class QuizRushViewModel: ObservableObject {
         
         if selectedAnswer == currentQuestion.correctAnswer {
             streak += 1
-            // Basic score points + cumulative streak multiplier bonuses
             score += 10 + (streak * 2)
             feedbackColor = .green.opacity(0.4)
         } else {
@@ -87,7 +104,6 @@ class QuizRushViewModel: ObservableObject {
             feedbackColor = .red.opacity(0.4)
         }
         
-        // Brief delay so the user can visualize correct/wrong screen feedback
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             self.feedbackColor = .clear
             self.currentIndex += 1
@@ -95,6 +111,11 @@ class QuizRushViewModel: ObservableObject {
             if self.currentIndex < self.questions.count {
                 self.shuffleAnswersForCurrentQuestion()
             } else {
+                GameSessionStore.shared.addSession(
+                    gameName: "Quiz Rush",
+                    score: self.score,
+                    location: LocationService.shared.currentLocation
+                )
                 self.viewState = .gameOver
             }
         }
