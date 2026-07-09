@@ -146,6 +146,11 @@ struct LightUpLoadingScreen: View {
         .onAppear {
             gameManager.startGame()
         }
+        .onChange(of: gameManager.isGameOver) {
+            if gameManager.isGameOver && gameManager.score > highScore {
+                highScore = gameManager.score
+            }
+        }
         .onDisappear {
             if gameManager.score > highScore {
                 highScore = gameManager.score
@@ -396,7 +401,14 @@ class LightUpGameManager: ObservableObject {
         }
     
     private func endGame() {
+        guard !isGameOver else { return }
+        
         isGameOver = true
+        GameSessionStore.shared.addSession(
+            gameName: "Light It Up",
+            score: score,
+            location: LocationService.shared.currentLocation
+        )
         gameTimer?.cancel()
         lightWindowTimer?.cancel()
     }

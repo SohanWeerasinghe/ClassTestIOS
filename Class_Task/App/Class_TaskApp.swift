@@ -12,6 +12,9 @@ struct Class_TaskApp: App {
     var body: some Scene {
         WindowGroup {
             Homepage()
+                .onAppear {
+                    LocationService.shared.requestLocation()
+                }
         }
     }
 }
