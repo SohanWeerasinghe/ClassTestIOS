@@ -1,5 +1,4 @@
 import SwiftUI
-import UserNotifications
 
 struct SettingsView: View {
     @AppStorage("quizCategory") private var quizCategoryRawValue: Int = QuizCategory.any.rawValue
@@ -19,8 +18,6 @@ struct SettingsView: View {
     @State private var notificationTime = Date()
     @State private var showResetConfirmation = false
     @State private var notificationStatus = "Daily challenge notifications are off."
-    
-    private let notificationIdentifier = "dailyChallengeReminder"
     
     private var dailyChallengeCategory: QuizCategory {
         QuizCategory(rawValue: dailyChallengeCategoryRawValue) ?? .any
@@ -185,7 +182,7 @@ struct SettingsView: View {
             if dailyNotificationsEnabled {
                 await scheduleDailyNotification()
             } else {
-                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [notificationIdentifier])
+                NotificationService.cancelDailyChallenge()
                 await MainActor.run {
                     notificationStatus = "Daily challenge notifications are off."
                 }
@@ -194,36 +191,21 @@ struct SettingsView: View {
     }
     
     private func scheduleDailyNotification() async {
-        let center = UNUserNotificationCenter.current()
-        
         do {
-            let allowed = try await center.requestAuthorization(options: [.alert, .sound])
-            guard allowed else {
-                await MainActor.run {
+            let allowed = try await NotificationService.scheduleDailyChallenge(
+                hour: dailyChallengeHour,
+                minute: dailyChallengeMinute,
+                category: dailyChallengeCategory,
+                difficulty: dailyChallengeDifficulty
+            )
+            
+            await MainActor.run {
+                if allowed {
+                    notificationStatus = "Daily challenge scheduled at \(formattedNotificationTime())."
+                } else {
                     dailyNotificationsEnabled = false
                     notificationStatus = "Notifications are blocked in iPhone Settings."
                 }
-                return
-            }
-            
-            center.removePendingNotificationRequests(withIdentifiers: [notificationIdentifier])
-            
-            let content = UNMutableNotificationContent()
-            content.title = "Daily Challenge"
-            content.body = "Play \(dailyChallengeCategory.title) on \(dailyChallengeDifficulty.title)."
-            content.sound = .default
-            
-            var dateComponents = DateComponents()
-            dateComponents.calendar = Calendar.current
-            dateComponents.hour = dailyChallengeHour
-            dateComponents.minute = dailyChallengeMinute
-            
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-            let request = UNNotificationRequest(identifier: notificationIdentifier, content: content, trigger: trigger)
-            try await center.add(request)
-            
-            await MainActor.run {
-                notificationStatus = "Daily challenge scheduled at \(formattedNotificationTime())."
             }
         } catch {
             await MainActor.run {

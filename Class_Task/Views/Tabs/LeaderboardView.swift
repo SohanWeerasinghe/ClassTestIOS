@@ -1,55 +1,20 @@
-
-//
-//  LeaderboardView.swift
-//  Class_Task
-//
-//  Created by Sohan Weerasinghe on 16/6/2026.
-//
-
 import SwiftUI
 import Charts
 
-enum GameModeFilter: String, CaseIterable, Identifiable {
-    case all = "All Games"
-    case tapMe = "Tap Me!"
-    case lightItUp = "Light It Up"
-    case quizRush = "Quiz Rush"
-    
-    var id: String { self.rawValue }
-}
-
 struct LeaderboardView: View {
-    // Read the persisted high scores directly from device storage
     @AppStorage("tapMeHighScore") private var tapMeHighScore: Int = 0
     @AppStorage("lightUpHighScore") private var lightUpHighScore: Int = 0
     @AppStorage("quizRushHighScore") private var quizRushHighScore: Int = 0
     
-    // Read live history records matching Map metrics
     @StateObject private var sessionStore = GameSessionStore.shared
-    @State private var selectedFilter: GameModeFilter = .all
+    @StateObject private var statsVM = StatsVM()
     
-    // Helper function to filter sessions based on segmented selection
     private var filteredSessions: [GameSession] {
-        if selectedFilter == .all {
-            return sessionStore.sessions
-        } else {
-            return sessionStore.sessions.filter { $0.gameName == selectedFilter.rawValue }
-        }
+        statsVM.filteredSessions(from: sessionStore.sessions)
     }
     
-    // FIX: Isolating the calculation expression so the layout block doesn't crash the type-checker
     private var maximumScore: Int {
-        filteredSessions.map { $0.score }.max() ?? 0
-    }
-    
-    // Helper function to return thematic match colors
-    private func colorForGame(_ name: String) -> Color {
-        switch name {
-        case "Tap Me!": return .orange
-        case "Light It Up": return .green
-        case "Quiz Rush": return .purple
-        default: return .gray
-        }
+        statsVM.maximumScore(from: sessionStore.sessions)
     }
     
     var body: some View {
@@ -72,7 +37,7 @@ struct LeaderboardView: View {
                 }
                 .padding(.top, 30)
                 
-                Picker("Select Game", selection: $selectedFilter) {
+                Picker("Select Game", selection: $statsVM.selectedFilter) {
                     ForEach(GameModeFilter.allCases) { filter in
                         Text(filter.rawValue).tag(filter)
                     }
@@ -82,8 +47,6 @@ struct LeaderboardView: View {
                 
                 ScrollView {
                     VStack(spacing: 22) {
-                        
-                        // 1. DYNAMIC SUMMARY BLOCK (Totals & Bests)
                         HStack(spacing: 16) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("TOTAL GAMES")
@@ -115,7 +78,6 @@ struct LeaderboardView: View {
                         }
                         .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
                         
-                        // 2. DYNAMIC BAR CHART COMPONENT
                         if !filteredSessions.isEmpty {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Score Progress History")
@@ -124,14 +86,11 @@ struct LeaderboardView: View {
                                 
                                 Chart {
                                     ForEach(Array(filteredSessions.enumerated()), id: \.offset) { index, session in
-                                        let gameLabel = "G\(index + 1)"
-                                        let barColor = colorForGame(session.gameName)
-                                        
                                         BarMark(
-                                            x: .value("Game #", gameLabel),
+                                            x: .value("Game #", "G\(index + 1)"),
                                             y: .value("Score", session.score)
                                         )
-                                        .foregroundStyle(barColor)
+                                        .foregroundStyle(statsVM.colorForGame(session.gameName))
                                         .cornerRadius(4)
                                     }
                                 }
@@ -144,37 +103,35 @@ struct LeaderboardView: View {
                             .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
                         }
                         
-                        // 3. CLASSIC HIGHSCORE CARDS
                         VStack(spacing: 12) {
-                            if selectedFilter == .all || selectedFilter == .tapMe {
+                            if statsVM.selectedFilter == .all || statsVM.selectedFilter == .tapMe {
                                 LeaderboardCard(
-                                    gameTitle: "Tap Me!",
+                                    gameTitle: GameMode.tapMe.title,
                                     highScore: tapMeHighScore,
-                                    icon: "hand.tap.fill",
-                                    themeColor: .orange
+                                    icon: GameMode.tapMe.icon,
+                                    themeColor: GameMode.tapMe.color
                                 )
                             }
                             
-                            if selectedFilter == .all || selectedFilter == .lightItUp {
+                            if statsVM.selectedFilter == .all || statsVM.selectedFilter == .lightItUp {
                                 LeaderboardCard(
-                                    gameTitle: "Light It Up",
+                                    gameTitle: GameMode.lightItUp.title,
                                     highScore: lightUpHighScore,
-                                    icon: "gamecontroller.fill",
-                                    themeColor: .green
+                                    icon: GameMode.lightItUp.icon,
+                                    themeColor: GameMode.lightItUp.color
                                 )
                             }
                             
-                            if selectedFilter == .all || selectedFilter == .quizRush {
+                            if statsVM.selectedFilter == .all || statsVM.selectedFilter == .quizRush {
                                 LeaderboardCard(
-                                    gameTitle: "Quiz Rush",
+                                    gameTitle: GameMode.quizRush.title,
                                     highScore: quizRushHighScore,
-                                    icon: "brain.head.profile",
-                                    themeColor: .purple
+                                    icon: GameMode.quizRush.icon,
+                                    themeColor: GameMode.quizRush.color
                                 )
                             }
                         }
                         
-                        // 4. RECENT GAMES BREAKDOWN LIST
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Recent Game Log")
                                 .font(.headline)
@@ -190,7 +147,7 @@ struct LeaderboardView: View {
                                 ForEach(filteredSessions.reversed().prefix(5)) { session in
                                     HStack {
                                         Circle()
-                                            .fill(colorForGame(session.gameName))
+                                            .fill(statsVM.colorForGame(session.gameName))
                                             .frame(width: 10, height: 10)
                                         
                                         VStack(alignment: .leading, spacing: 2) {
@@ -204,7 +161,6 @@ struct LeaderboardView: View {
                                         
                                         Spacer()
                                         
-                                        // FIX: Simplified the layout engine calculation signature down into a clean explicit String conversion to completely remove layout type timeouts
                                         Text(String(session.score) + " pts")
                                             .font(.system(.subheadline, design: .rounded)).bold()
                                             .foregroundColor(.black)
@@ -218,7 +174,6 @@ struct LeaderboardView: View {
                         .background(Color.white)
                         .cornerRadius(18)
                         .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-                        
                     }
                     .padding(.horizontal, 25)
                     .padding(.top, 5)

@@ -1,36 +1,10 @@
-//
-//   ContentView.swift
-//   Class_Task
-//
-//   Created by Sohan Weerasinghe on 2026-06-07.
-//
-
 import SwiftUI
 import Combine
-import CoreHaptics
-import AVFoundation
 
 struct ContentView: View {
-    
     @Environment(\.dismiss) var dismiss
+    @StateObject private var viewModel = TapFrenzyVM()
     
-    @State private var score: Int = 0
-    @State private var timeRemaining: Int = 10
-    @State private var isGameOver: Bool = false
-    @State private var currentColor: Color = .blue
-    @State private var isDangerTarget: Bool = false
-    @State private var targetPosition: CGPoint = .zero
-    @State private var hasPositionedTarget: Bool = false
-    
-    @State private var clicksThisSecond: Int = 0
-    @State private var hasTappedThisSecond: Bool = false
-    @State private var buttonScale: CGFloat = 1.0
-    @State private var dangerResetTask: DispatchWorkItem?
-    
-    @State private var audioPlayer: AVAudioPlayer?
-    @AppStorage("tapMeHighScore") private var tapMeHighScore: Int = 0
-    
-    let colorPalette: [Color] = [.green, .yellow, .pink, .blue, .purple, .orange, .cyan]
     let gameTimer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
     
     var body: some View {
@@ -83,7 +57,7 @@ struct ContentView: View {
                                 .font(.caption2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.secondary)
-                            Text("\(score)")
+                            Text("\(viewModel.score)")
                                 .font(.title).bold()
                                 .foregroundColor(.white)
                         }
@@ -99,9 +73,9 @@ struct ContentView: View {
                                 .font(.caption2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.secondary)
-                            Text("\(timeRemaining)s")
+                            Text("\(viewModel.timeRemaining)s")
                                 .font(.title).bold()
-                                .foregroundColor(timeRemaining <= 3 ? .red : .purple)
+                                .foregroundColor(viewModel.timeRemaining <= 3 ? .red : .purple)
                         }
                     }
                     .padding(.horizontal, 24)
@@ -115,27 +89,26 @@ struct ContentView: View {
                     .padding(.horizontal, 24)
                     
                     Spacer()
-                    
                     Spacer()
                 }
             }
             
             GeometryReader { geometry in
-                if !isGameOver {
+                if !viewModel.isGameOver {
                     targetButton(in: geometry.size)
-                        .position(targetPosition)
+                        .position(viewModel.targetPosition)
                         .onAppear {
-                            if !hasPositionedTarget {
-                                moveTarget(in: geometry.size)
+                            if !viewModel.hasPositionedTarget {
+                                viewModel.moveTarget(in: geometry.size)
                             }
                         }
                         .onChange(of: geometry.size) {
-                            moveTarget(in: geometry.size)
+                            viewModel.moveTarget(in: geometry.size)
                         }
                 }
             }
             
-            if isGameOver {
+            if viewModel.isGameOver {
                 Color.black.opacity(0.65)
                     .ignoresSafeArea()
                     .transition(.opacity)
@@ -149,18 +122,18 @@ struct ContentView: View {
                         Text("Final Score")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        Text("\(score)")
+                        Text("\(viewModel.score)")
                             .font(.system(size: 48, weight: .bold))
                             .foregroundColor(.primary)
                         
-                        if score > tapMeHighScore {
+                        if viewModel.isNewHighScore {
                             Text("🎉 New High Score! 🎉")
                                 .font(.subheadline)
                                 .foregroundColor(.green)
                                 .bold()
                                 .padding(.top, 4)
                         } else {
-                            Text("Best Score: \(tapMeHighScore)")
+                            Text("Best Score: \(viewModel.highScore)")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
                         }
@@ -169,7 +142,7 @@ struct ContentView: View {
                     
                     Button(action: {
                         withAnimation(.spring()) {
-                            resetGame()
+                            viewModel.resetGame()
                         }
                     }) {
                         Text("Play Again")
@@ -194,26 +167,18 @@ struct ContentView: View {
         }
         .onReceive(gameTimer) { _ in
             withAnimation(.default) {
-                updateGameTick()
+                viewModel.updateGameTick()
             }
         }
     }
-        
+    
     private func targetButton(in size: CGSize) -> some View {
         Button(action: {
-            withAnimation(.spring(response: 0.15, dampingFraction: 0.4)) {
-                buttonScale = 0.9
-            }
-            handleTargetTap(in: size)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
-                withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
-                    buttonScale = 1.0
-                }
-            }
+            viewModel.pressButton()
+            viewModel.handleTargetTap(in: size)
         }) {
             ZStack {
-                if isDangerTarget {
+                if viewModel.isDangerTarget {
                     Circle()
                         .fill(Color.red.opacity(0.95))
                         .frame(width: 160, height: 160)
@@ -230,9 +195,9 @@ struct ContentView: View {
                         )
                 } else {
                     Circle()
-                        .fill(currentColor.gradient)
+                        .fill(viewModel.currentColor.gradient)
                         .frame(width: 160, height: 160)
-                        .shadow(color: currentColor.opacity(0.5), radius: 25, x: 0, y: 10)
+                        .shadow(color: viewModel.currentColor.opacity(0.5), radius: 25, x: 0, y: 10)
                     
                     Circle()
                         .stroke(Color.white.opacity(0.4), lineWidth: 4)
@@ -246,137 +211,12 @@ struct ContentView: View {
             }
             .frame(width: 160, height: 160)
         }
-        .scaleEffect(buttonScale)
+        .scaleEffect(viewModel.buttonScale)
         .buttonStyle(PlainButtonStyle())
         .transition(.scale.combined(with: .opacity))
     }
-    
-    // --- Core Methods Kept Securely Inside Struct Scope ---
-    func handleTargetTap(in size: CGSize) {
-        if isDangerTarget {
-            endGame()
-            return
-        }
-        
-        clicksThisSecond = clicksThisSecond + 1
-        hasTappedThisSecond = true
-        randomizeTarget(in: size)
-    }
-    
-    private func randomizeTarget(in size: CGSize) {
-        dangerResetTask?.cancel()
-        
-        let randomIndex = Int.random(in: 0..<colorPalette.count)
-        currentColor = colorPalette[randomIndex]
-        isDangerTarget = randomIndex == 0
-        moveTarget(in: size)
-        
-        if isDangerTarget {
-            scheduleDangerTargetReset(in: size)
-        }
-    }
-    
-    private func scheduleDangerTargetReset(in size: CGSize) {
-        let resetTask = DispatchWorkItem {
-            guard !isGameOver, isDangerTarget else { return }
-            
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
-                isDangerTarget = false
-                currentColor = colorPalette.randomElement() ?? .blue
-                moveTarget(in: size)
-            }
-        }
-        
-        dangerResetTask = resetTask
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7, execute: resetTask)
-    }
-    
-    private func moveTarget(in size: CGSize) {
-        let radius: CGFloat = 80
-        let topPadding: CGFloat = 210
-        let bottomPadding: CGFloat = 120
-        let minX = radius + 16
-        let maxX = max(minX, size.width - radius - 16)
-        let minY = min(size.height - radius, topPadding)
-        let maxY = max(minY, size.height - bottomPadding)
-        
-        targetPosition = CGPoint(
-            x: CGFloat.random(in: minX...maxX),
-            y: CGFloat.random(in: minY...maxY)
-        )
-        hasPositionedTarget = true
-    }
-    
-    func updateGameTick() {
-        if isGameOver == false {
-            if hasTappedThisSecond == true {
-                if clicksThisSecond == 1 {
-                    score = score + 1
-                } else if clicksThisSecond == 2 {
-                    score = score + 2
-                } else if clicksThisSecond == 3 {
-                    score = score + 3
-                } else if clicksThisSecond > 3 {
-                    score = score + clicksThisSecond + 10
-                }
-                clicksThisSecond = 0
-                hasTappedThisSecond = false
-            }
-            
-            if timeRemaining > 0 {
-                timeRemaining -= 1
-            } else {
-                endGame()
-            }
-        }
-    }
-    
-    func resetGame() {
-        dangerResetTask?.cancel()
-        dangerResetTask = nil
-        score = 0
-        timeRemaining = 10
-        currentColor = .blue
-        isDangerTarget = false
-        isGameOver = false
-        clicksThisSecond = 0
-        hasTappedThisSecond = false
-        buttonScale = 1.0
-        hasPositionedTarget = false
-        audioPlayer?.stop()
-    }
-    
-    private func endGame() {
-        guard !isGameOver else { return }
-        
-        dangerResetTask?.cancel()
-        dangerResetTask = nil
-        isGameOver = true
-        GameSessionStore.shared.addSession(
-            gameName: "Tap Me!",
-            score: score,
-            location: LocationService.shared.currentLocation
-        )
-        if score > tapMeHighScore {
-            tapMeHighScore = score
-        }
-        playGameOverSound()
-    }
-    
-    func playGameOverSound() {
-        if let path = Bundle.main.path(forResource: "Game Over", ofType: "mp3") {
-            let url = URL(fileURLWithPath: path)
-            do {
-                audioPlayer = try AVAudioPlayer(contentsOf: url)
-                audioPlayer?.play()
-            } catch {
-                print("Error playing sound file structure")
-            }
-        }
-    }
 }
 
-//Hex Color
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -384,11 +224,11 @@ extension Color {
         Scanner(string: hex).scanHexInt64(&int)
         let a, r, g, b: UInt64
         switch hex.count {
-        case 3: // RGB (12-bit)
+        case 3:
             (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
+        case 6:
             (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 7: // ARGB (32-bit)
+        case 7:
             (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
         default:
             (a, r, g, b) = (1, 1, 1, 1)
