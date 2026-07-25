@@ -1,7 +1,9 @@
+
 import SwiftUI
 
 struct ResultView: View {
     let title: String
+    let gameName: String
     let score: Int
     let bestScore: Int
     let isNewHighScore: Bool
@@ -13,6 +15,7 @@ struct ResultView: View {
 
     init(
         title: String,
+        gameName: String,
         score: Int,
         bestScore: Int,
         isNewHighScore: Bool,
@@ -23,6 +26,7 @@ struct ResultView: View {
         secondaryAction: (() -> Void)? = nil
     ) {
         self.title = title
+        self.gameName = gameName
         self.score = score
         self.bestScore = bestScore
         self.isNewHighScore = isNewHighScore
@@ -31,6 +35,14 @@ struct ResultView: View {
         self.primaryAction = primaryAction
         self.secondaryActionTitle = secondaryActionTitle
         self.secondaryAction = secondaryAction
+    }
+
+    private var shareMessage: String {
+        if isNewHighScore {
+            return "New high score in \(gameName)! I scored \(score) points. Can you beat it?"
+        }
+        
+        return "I scored \(score) points in \(gameName)! My best score is \(bestScore). Can you beat it?"
     }
 
     var body: some View {
@@ -63,6 +75,21 @@ struct ResultView: View {
             }
             .padding(.vertical, 12)
 
+            ShareLink(item: shareMessage) {
+                Label("Share Achievement", systemImage: "square.and.arrow.up.fill")
+                    .font(.headline)
+                    .bold()
+                    .foregroundColor(themeColor)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(themeColor.opacity(0.12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(themeColor.opacity(0.35), lineWidth: 1)
+                    )
+                    .cornerRadius(14)
+            }
+
             Button(action: primaryAction) {
                 Text(primaryActionTitle)
                     .font(.headline)
@@ -91,6 +118,7 @@ struct ResultView: View {
 #Preview {
     ResultView(
         title: "Game Over",
+        gameName: "Tap Frenzy",
         score: 120,
         bestScore: 140,
         isNewHighScore: false,

@@ -1,3 +1,10 @@
+//
+//  TapFrenzyView.swift
+//  Class_Task
+//
+//  Created by Sohan Weerasinghe on 13/6/2026.
+//
+
 import SwiftUI
 import Combine
 
@@ -115,6 +122,7 @@ struct TapFrenzyView: View {
                 
                 ResultView(
                     title: "Game Over",
+                    gameName: "Tap Frenzy",
                     score: viewModel.score,
                     bestScore: viewModel.highScore,
                     isNewHighScore: viewModel.isNewHighScore,

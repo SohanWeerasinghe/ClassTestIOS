@@ -4,6 +4,7 @@
 //
 //  Created by Sohan Weerasinghe on 2026-06-07.
 //
+
 import SwiftUI
 
 struct LoadingScreen: View {

@@ -1,3 +1,10 @@
+//
+//  LightItUp.swift
+//  Class_Task
+//
+//  Created by Sohan Weerasinghe on 15/6/2026.
+//
+
 import SwiftUI
 
 struct LightItUpView: View {
@@ -72,6 +79,7 @@ struct LightItUpView: View {
                 } else {
                     ResultView(
                         title: "Game Over",
+                        gameName: "Light It Up",
                         score: gameManager.score,
                         bestScore: max(gameManager.score, highScore),
                         isNewHighScore: madeNewHighScore,

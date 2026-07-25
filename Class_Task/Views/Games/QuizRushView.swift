@@ -1,3 +1,10 @@
+//
+//  QuizRushView.swift
+//  Class_Task
+//
+//  Created by Sohan Weerasinghe on 03/7/2026.
+//
+
 import SwiftUI
 
 struct QuizRushView: View {
@@ -240,6 +247,7 @@ struct QuizRushView: View {
     private var gameOverView: some View {
         ResultView(
             title: "Round Completed",
+            gameName: "Quiz Rush",
             score: viewModel.score,
             bestScore: max(viewModel.score, highScore),
             isNewHighScore: madeNewHighScore,

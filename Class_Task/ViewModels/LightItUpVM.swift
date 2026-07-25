@@ -1,3 +1,10 @@
+//
+//  LightItUpVM.swift
+//  Class_Task
+//
+//  Created by Sohan Weerasinghe on 15/6/2026.
+//
+
 import SwiftUI
 import Combine
 import AVFAudio
@@ -253,3 +260,4 @@ class LightUpGameManager: ObservableObject {
         lightWindowTimer?.cancel()
     }
 }
+ 

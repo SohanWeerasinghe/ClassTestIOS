@@ -1,8 +1,8 @@
 //
-//  Homepage.swift
+//  HomeTab.swift
 //  Class_Task
 //
-//  Created by Sohan Weerasinghe on 15/6/2026.
+//  Created by Sohan Weerasinghe on 13/6/2026.
 //
 
 import SwiftUI
@@ -11,75 +11,90 @@ import AVFoundation
 struct HomeTab: View {
     @State private var backgroundMusicPlayer: AVAudioPlayer?
     
+    // for the background theme Palette
+    private let bgDark = Color(red: 13/255, green: 15/255, blue: 23/255)
+    
     var body: some View {
         TabView {
             NavigationStack {
                 ZStack {
-                    Image("back2")
-                        .resizable()
-                        .ignoresSafeArea()
-                        .opacity(0.6)
+                    // dark color theme for the background
+                    bgDark.ignoresSafeArea()
                     
-                    VStack(spacing: 35) {
-                        VStack(spacing: 8) {
-                            Text("Welcome to")
-                                .font(.system(size: 50, weight: .bold))
-                                .foregroundColor(.black)
-                                .fontDesign(.serif)
-                            Text("Game Arcade")
-                                .font(.system(size: 50, weight: .black))
-                                .foregroundColor(.black)
-                                .fontDesign(.serif)
+                    // background glow effect
+                    RadialGradient(
+                        colors: [Color.cyan.opacity(0.18), Color.clear],
+                        center: .topLeading,
+                        startRadius: 20,
+                        endRadius: 350
+                    )
+                    .ignoresSafeArea()
+                    
+                    RadialGradient(
+                        colors: [Color(red: 1.0, green: 0.16, blue: 0.52).opacity(0.15), Color.clear],
+                        center: .bottomTrailing,
+                        startRadius: 20,
+                        endRadius: 400
+                    )
+                    .ignoresSafeArea()
+                    
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 32) {
                             
-                            Text("Select a game to play")
-                                .font(.subheadline)
-                                .foregroundColor(.black)
-                        }
-                        .padding(.top, 40)
-                        
-                        Spacer()
-                        
-                        VStack(spacing: 20) {
-                            NavigationLink(destination: LoadingScreen()) {
-                                GameMenuCard(title: "Tap Frenzy!",
-                                             subtitle: "Test your speed clicking skills",
-                                             icon: "hand.tap.fill",
-                                             color: .orange)
+                            // Home page header titlr
+                            VStack(spacing: 6) {
+                                HStack(spacing: 6) {
+                                    Text("WELCOME TO")
+                                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                                        .foregroundColor(Color.cyan)
+                                        .tracking(3)
+                                }
+                                
+                                Text("GAME ARCADE")
+                                    .font(.system(size: 38, weight: .black, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .shadow(color: .cyan.opacity(0.5), radius: 8, x: 0, y: 0)
+                                
+                                Text("Select a arena to start playing")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(Color.white.opacity(0.6))
                             }
+                            .padding(.top, 25)
                             
-                            NavigationLink(destination: LightItUpView()) {
-                                GameMenuCard(title: "Light It Up",
-                                             subtitle: "Click the lighted up squere as fast as you can!",
-                                             icon: "inset.filled.square",
-                                             color: .green)
+                            // 3 main game cards list
+                            VStack(spacing: 16) {
+                                NavigationLink(destination: LoadingScreen()) {
+                                    GameMenuCard(
+                                        title: "Tap Frenzy!",
+                                        subtitle: "Test your speed clicking skills",
+                                        icon: "hand.tap.fill",
+                                        accentColor: Color.orange
+                                    )
+                                }
+                                
+                                NavigationLink(destination: LightItUpView()) {
+                                    GameMenuCard(
+                                        title: "Light It Up",
+                                        subtitle: "Click the lighted square fast!",
+                                        icon: "inset.filled.square",
+                                        accentColor: Color.green
+                                    )
+                                }
+                                
+                                NavigationLink(destination: QuizRushView()) {
+                                    GameMenuCard(
+                                        title: "Quiz Rush",
+                                        subtitle: "Challenge your mind with trivia!",
+                                        icon: "brain.head.profile",
+                                        accentColor: Color.purple
+                                    )
+                                }
                             }
-                
-                            NavigationLink(destination: QuizRushView()) {
-                                GameMenuCard(
-                                    title: "Quiz Rush",
-                                    subtitle: "Challenge your mind with live trivia!",
-                                    icon: "brain.head.profile",
-                                    color: .purple
-                                )
-                            }
+                            .padding(.horizontal, 20)
+                            
+                            Spacer(minLength: 30)
                         }
-                        .padding(.horizontal, 25)
-                        
-                        Spacer()
                     }
-//                    .toolbar {
-//                        ToolbarItem(placement: .navigationBarTrailing) {
-//                            NavigationLink(destination: StatsTab()) {
-//                                HStack(spacing: 4) {
-//                                    Image(systemName: "trophy.fill")
-//                                    Text("Scores")
-//                                }
-//                                .font(.subheadline)
-//                                .bold()
-//                                .foregroundColor(.orange)
-//                            }
-//                        }
-//                    }
                 }
                 .onAppear {
                     playBackgroundMusic()
@@ -117,9 +132,9 @@ struct HomeTab: View {
                 Text("Settings")
             }
         }
-        .tint(.purple)
+        .tint(Color.cyan)
+        .preferredColorScheme(.dark)
     }
-    
     
     private func playBackgroundMusic() {
         if let path = Bundle.main.path(forResource: "gamingmusic", ofType: "mp3") {
@@ -129,7 +144,7 @@ struct HomeTab: View {
                 try AVAudioSession.sharedInstance().setActive(true)
                 
                 backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
-                backgroundMusicPlayer?.numberOfLoops = -1 // Loops indefinitely
+                backgroundMusicPlayer?.numberOfLoops = -1
                 backgroundMusicPlayer?.volume = 0.5
                 backgroundMusicPlayer?.prepareToPlay()
                 backgroundMusicPlayer?.play()
@@ -153,22 +168,26 @@ struct SimpleTabPage: View {
     let title: String
     let icon: String
     
+    private let bgDark = Color(red: 13/255, green: 15/255, blue: 23/255)
+    
     var body: some View {
         ZStack {
-            Image("back2")
-                .resizable()
-                .ignoresSafeArea()
-                .opacity(0.6)
+            bgDark.ignoresSafeArea()
             
-            VStack(spacing: 16) {
-                Image(systemName: icon)
-                    .font(.system(size: 50))
-                    .foregroundColor(.purple)
+            VStack(spacing: 20) {
+                ZStack {
+                    Circle()
+                        .fill(Color.cyan.opacity(0.15))
+                        .frame(width: 100, height: 100)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 45, weight: .bold))
+                        .foregroundColor(.cyan)
+                }
                 
                 Text(title)
-                    .font(.largeTitle)
-                    .bold()
-                    .foregroundColor(.black)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
             }
         }
     }
@@ -178,38 +197,55 @@ struct GameMenuCard: View {
     let title: String
     let subtitle: String
     let icon: String
-    let color: Color
+    let accentColor: Color
     
     var body: some View {
-        HStack(spacing: 20) {
-            Image(systemName: icon)
-                .font(.system(size: 35))
-                .foregroundColor(.white)
-                .frame(width: 70, height: 70)
-                .background(color)
-                .cornerRadius(15)
+        HStack(spacing: 16) {
+            // game card icon
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(accentColor.opacity(0.2))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(accentColor.opacity(0.6), lineWidth: 1.5)
+                    )
+                
+                Image(systemName: icon)
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundColor(accentColor)
+            }
+            .frame(width: 60, height: 60)
+            .shadow(color: accentColor.opacity(0.3), radius: 6, x: 0, y: 0)
             
+            // Game menu card title code
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(.black)
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
                 
                 Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(Color.white.opacity(0.6))
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
             }
             
             Spacer()
             
+            // Arrow icon for the every game access buttons
             Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
+                .foregroundColor(Color.white.opacity(0.4))
                 .font(.system(size: 14, weight: .bold))
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(18)
-        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.06))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                )
+        )
     }
 }
 
