@@ -19,7 +19,7 @@
 ---
 
 ## 📁 Folder Structure
-
+```text
 Class_Task/
 ├── App/
 │   └── Class_TaskApp.swift
@@ -53,8 +53,8 @@ Class_Task/
         ├── MapTab.swift
         ├── SettingsTab.swift
         └── StatsTab.swift
-
-###🗺️ Extended Framework Functions
+```
+### 🗺️ Extended Framework Functions
 
 * **🏆 Stats & Interactive Analytics Dashboard:** * Integrated with custom SwiftUI Charts layouts. Features filtering options to view total matches played, absolute maximum records, historical performance bar graphs (BarMark), and a historical match timeline.
 
@@ -62,7 +62,7 @@ Class_Task/
 
 * **🎵 Media System & Audio Pipeline:** * Built using AVFoundation. Runs background ambient loops that handle interruptions gracefully alongside other apps.
 
-###🏗️ Architectural Overview (MVVM)
+### 🏗️ Architectural Overview (MVVM)
 
 The app follows standard development separation concepts to keep logic decoupleable and easy to maintain:
 
@@ -71,39 +71,52 @@ The app follows standard development separation concepts to keep logic decouplea
 thread-safe layout operations away from background threads.
 * **Views:** * Structural layers parsing system properties via standard bindings (@StateObject, @AppStorage, and @Environment).
 
-###🌐 External APIs Used
+### 🌐 External APIs Used
 
 Open Trivia Database (OpenTDB)
 URL: https://opentdb.com/
 Description: Provides dynamic trivia questions, categories, and difficulties fetched via REST API endpoints.
 
-###🔐 Required System Permissions
+### 🔐 Required System Permissions
 
 Location Services (NSLocationWhenInUseUsageDescription): Required to fetch coordinates and drop match markers on the arcade statistics map upon finishing a session.
 Notifications (UNUserNotificationCenter): Used to send local notifications and gameplay reminders to players.
 
-###⚠️ App Limitations
+### ⚠️ App Limitations
 
 * **Active Internet Connection:** *  Required to fetch live trivia question packs from the OpenTDB API during Quiz Rush sessions.
 * **No Authentication:** *  Runs completely locally without user accounts, backend registration, or remote profile cloud sync.
 * **Language Support:** *  English-only interface and trivia data payload.
 
-###🔊 Credits & Attributions
+### 🔊 Credits & Attributions
 
 * **Game Over Sound Effect:** *  Pixabay Sound Effects
 * **Background & Level Up Music:** *  Free To Use Music
 
-###🛠️ Requirements & Technical Specs
+### 🛠️ Requirements & Technical Specs
 
 * **IDE:** * Xcode 15.0 or newer
 * **Language:** * Swift 5.9+
 * **Deployment Target:** * iOS 17.0+
 * **Dependencies:** * None (Relies entirely on native system frameworks)
 
-###📝 Setup Instructions
+### 📝 Setup Instructions
 
 Clone or extract the project source code workspace folder onto your macOS disk.
 Open the project via the Class_Task.xcodeproj file path configuration launcher.
 Select your designated Simulator instance context environment configuration or your physical deployment device.
 Go to Product > Clean Build Folder (Cmd + Shift + K).
 Press Run (Cmd + R) to build and start playing!
+
+### Reflection
+
+Taking on this project without any background in Swift was quite a personal challenge. Getting used to a completely new language, syntax and framework (SwiftUI) meant I had to keep solving problems and learning the basics constantly.
+The weekly check ins gave me clear guidance and ongoing feedback. This step-by-step review helped me stay on track and gradually get a better view of Swift best practices.
+When I ran into unexpected bugs and compiler errors, I used technical documentation, developer forums and online resources to figure things out. I learned how to debug tricky issues, find their root causes and write cleaner code to avoid similar problems later on.
+In the end, getting over these challenges turned a tough task into a rewarding experience, giving me a solid foundation in Swift and iOS app development.
+
+---
+
+## ⚖️ Educational Disclaimer
+
+This application was developed solely for academic and educational purposes as part of coursework. All third-party media, audio assets, and external API services (such as OpenTDB) used throughout this project are property of their respective owners and are utilized under fair use guidelines for educational demonstration. Any omitted attributions or unintended omissions are strictly unintentional.
