@@ -79,8 +79,8 @@ Description: Provides dynamic trivia questions, categories, and difficulties fet
 
 ### 🔐 Required System Permissions
 
-Location Services (NSLocationWhenInUseUsageDescription): Required to fetch coordinates and drop match markers on the arcade statistics map upon finishing a session.
-Notifications (UNUserNotificationCenter): Used to send local notifications and gameplay reminders to players.
+* **Location Services:** Required to fetch coordinates and drop match markers on the arcade statistics map upon finishing a session.
+* **Notifications:** Used to send local notifications and gameplay reminders to players.
 
 ### ⚠️ App Limitations
 
@@ -102,11 +102,11 @@ Notifications (UNUserNotificationCenter): Used to send local notifications and g
 
 ### 📝 Setup Instructions
 
-Clone or extract the project source code workspace folder onto your macOS disk.
-Open the project via the Class_Task.xcodeproj file path configuration launcher.
-Select your designated Simulator instance context environment configuration or your physical deployment device.
-Go to Product > Clean Build Folder (Cmd + Shift + K).
-Press Run (Cmd + R) to build and start playing!
+* **Clone or extract the project source code workspace folder onto your macOS disk.** *
+* **Open the project via the Class_Task.xcodeproj file path configuration launcher.** *
+* **Select your designated Simulator instance context environment configuration or your physical deployment device.** *
+* **Go to Product > Clean Build Folder (Cmd + Shift + K).** *
+* **Press Run (Cmd + R) to build and start playing!** *
 
 ### Reflection
 
