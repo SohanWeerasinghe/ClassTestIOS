@@ -18,38 +18,91 @@
 
 ---
 
-## 🗺️ Extended Framework Functions
+## 📁 Folder Structure
 
-* **🏆 Stats & Interactive Analytics Dashboard:** Integrated with custom `SwiftUI Charts` layouts. Features filtering options to view total matches played, absolute maximum records, historical performance bar graphs (`BarMark`), and a historical match timeline.
-* **📍 Game Map Pinning Engine:** Utilizes Apple's native `MapKit` and `CoreLocation` hardware frameworks. Automatically asks for authorization upon initialization (`requestWhenInUseAuthorization`). Dropping an arcade pin (`Marker`) displays specific game descriptions, date timestamps, exact score properties, and signal radius details (`horizontalAccuracy`).
-* **🎵 Media System & Audio Pipeline:** Built using `AVFoundation`. Runs background ambient loops that handle interruptions gracefully alongside other apps.
+```text
+Class_Task/
+├── App/
+│   └── Class_TaskApp.swift
+├── Models/
+│   ├── GameMode.swift
+│   ├── GameSession.swift
+│   └── TriviaQuestion.swift
+├── Resources/
+│   ├── Sounds/
+│   └── Assets.xcassets
+├── Services/
+│   ├── LocationService.swift
+│   ├── NotificationService.swift
+│   └── TriviaAPI.swift
+├── ViewModels/
+│   ├── LightItUpVM.swift
+│   ├── QuizRushVM.swift
+│   ├── StatsVM.swift
+│   └── TapFrenzyVM.swift
+└── Views/
+    ├── Games/
+    │   ├── LightItUpView.swift
+    │   ├── LoadingScreen.swift
+    │   ├── QuizRushView.swift
+    │   └── TapFrenzyView.swift
+    ├── Shared/
+    │   ├── ResultView.swift
+    │   └── ScoreBadge.swift
+    └── Tabs/
+        ├── HomeTab.swift
+        ├── MapTab.swift
+        ├── SettingsTab.swift
+        └── StatsTab.swift
 
----
+###🗺️ Extended Framework Functions
 
-## 🏗️ Architectural Overview (MVVM)
+🏆 Stats & Interactive Analytics Dashboard: Integrated with custom SwiftUI Charts layouts. Features filtering options to view total matches played, absolute maximum records, historical performance bar graphs (BarMark), and a historical match timeline.
+
+📍 Game Map Pinning Engine: Utilizes Apple's native MapKit and CoreLocation hardware frameworks. Automatically asks for authorization upon initialization (requestWhenInUseAuthorization). Dropping an arcade pin (Marker) displays specific game descriptions, date timestamps, exact score properties, and signal radius details (horizontalAccuracy).
+
+🎵 Media System & Audio Pipeline: Built using AVFoundation. Runs background ambient loops that handle interruptions gracefully alongside other apps.
+
+###🏗️ Architectural Overview (MVVM)
 
 The app follows standard development separation concepts to keep logic decoupleable and easy to maintain:
+Models: Strongly-typed structs conforming to Codable and Identifiable for parsing server responses cleanly.
+ViewModels: ObservableObject controllers utilizing @Published state tracking variables. Marked with @MainActor keywords to guarantee thread-safe layout operations away from background threads.
+Views: Structural layers parsing system properties via standard bindings (@StateObject, @AppStorage, and @Environment).
 
-* **Models:** Strongly-typed structs conforming to `Codable` and `Identifiable` for parsing server responses cleanly.
-* **ViewModels:** `ObservableObject` controllers utilizing `@Published` state tracking variables. Marked with `@MainActor` keywords to guarantee thread-safe layout operations away from background threads.
-* **Views:** Structural layers parsing system properties via standard bindings (`@StateObject`, `@AppStorage`, and `@Environment`).
+###🌐 External APIs Used
 
----
+Open Trivia Database (OpenTDB)
+URL: https://opentdb.com/
+Description: Provides dynamic trivia questions, categories, and difficulties fetched via REST API endpoints.
 
-## 🛠️ Requirements & Technical Specs
+###🔐 Required System Permissions
 
-* **IDE:** Xcode 15.0 or newer
-* **Language:** Swift 5.9+
-* **Deployment Target:** iOS 17.0+
-* **Dependencies:** None (Relies entirely on native system frameworks)
+Location Services (NSLocationWhenInUseUsageDescription): Required to fetch coordinates and drop match markers on the arcade statistics map upon finishing a session.
+Notifications (UNUserNotificationCenter): Used to send local notifications and gameplay reminders to players.
 
----
+###⚠️ App Limitations
 
-## 📝 Setup Instructions
+Active Internet Connection: Required to fetch live trivia question packs from the OpenTDB API during Quiz Rush sessions.
+No Authentication: Runs completely locally without user accounts, backend registration, or remote profile cloud sync.
+Language Support: English-only interface and trivia data payload.
 
-1. Clone or extract the project source code workspace folder onto your macOS disk.
-2. Open the project via the **`Class_Task.xcodeproj`** file path configuration launcher.
-3. Select your designated Simulator instance context environment configuration or your physical deployment device.
-4. Go to **Product** > **Clean Build Folder** (`Cmd + Shift + K`).
-5. Press **Run** (`Cmd + R`) to build and start playing!
-```
+###🔊 Credits & Attributions
+
+Game Over Sound Effect: Pixabay Sound Effects
+Background & Level Up Music: Free To Use Music
+
+###🛠️ Requirements & Technical Specs
+
+IDE: Xcode 15.0 or newer
+Language: Swift 5.9+
+Deployment Target: iOS 17.0+
+Dependencies: None (Relies entirely on native system frameworks)
+
+###📝 Setup Instructions
+
+Clone or extract the project source code workspace folder onto your macOS disk.
+Open the project via the Class_Task.xcodeproj file path configuration launcher.
+Select your designated Simulator instance context environment configuration or your physical deployment device.
+Go to Product > Clean Build Folder (Cmd + Shift + K).
+Press Run (Cmd + R) to build and start playing!
