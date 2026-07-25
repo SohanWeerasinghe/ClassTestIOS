@@ -54,15 +54,25 @@ Class_Task/
         ├── SettingsTab.swift
         └── StatsTab.swift
 ```
-### 🗺️ Extended Framework Functions
+---
 
-* **🏆 Stats & Interactive Analytics Dashboard:** * Integrated with custom SwiftUI Charts layouts. Features filtering options to view total matches played, absolute maximum records, historical performance bar graphs (BarMark), and a historical match timeline.
+## ✨ Key Features & Functions
 
-* **📍 Game Map Pinning Engine:** * Utilizes Apple's native MapKit and CoreLocation hardware frameworks. Automatically asks for authorization upon initialization (requestWhenInUseAuthorization). Dropping an arcade pin (Marker) displays specific game descriptions, date timestamps, exact score properties, and signal radius details (horizontalAccuracy).
+* **🕹️ Interactive Mini-Games Suite:** Includes three full-featured arcade games:
+  * **⚡ Tap Frenzy:** Fast-paced reaction challenge with dynamic combo multipliers.
+  * **💡 Light It Up:** Reflex-testing grid matrix with scaling difficulty levels (`L1`–`L4`).
+  * **🧠 Quiz Rush:** Real-time trivia powered by asynchronous REST API calls.
+* **👤 Customizable Player Profile:** Personalize your arcade identity with custom usernames and avatars.
+* **🪙 In-Game Economy:** Earn coins through gameplay to unlock new avatars in the shop.
+* **📅 Daily Challenge System:** Complete daily tasks with automated local push notification reminders (`UNUserNotificationCenter`).
+* **📊 Statistics & Performance Dashboard:** Detailed analytics to track total matches played, high scores, and performance history using `SwiftUI Charts`.
+* **🗺️ MapKit Province Exploration:** Interactive location-based engine using `CoreLocation` and `MapKit` to pin played game sessions and explore discovered provinces.
+* **🎵 Dynamic Audio Pipeline:** Features background music loops and responsive sound effects (`AVFoundation`).
+* **💾 Local Data Persistence:** Instant, offline data saving for game sessions, high scores, coins, and settings using `UserDefaults` and `@AppStorage`.
+* **🎨 Modern Responsive UI:** Built completely with SwiftUI following the **MVVM** software architecture pattern for clean, thread-safe UI updates.
+* **🔗 Score Sharing:** Generate sharable links to boast high scores and challenge friends.
 
-* **🎵 Media System & Audio Pipeline:** * Built using AVFoundation. Runs background ambient loops that handle interruptions gracefully alongside other apps.
-
-### 🏗️ Architectural Overview (MVVM)
+## 🏗️ Architectural Overview (MVVM)
 
 The app follows standard development separation concepts to keep logic decoupleable and easy to maintain:
 
@@ -71,36 +81,36 @@ The app follows standard development separation concepts to keep logic decouplea
 thread-safe layout operations away from background threads.
 * **Views:** * Structural layers parsing system properties via standard bindings (@StateObject, @AppStorage, and @Environment).
 
-### 🌐 External APIs Used
+## 🌐 External APIs Used
 
 Open Trivia Database (OpenTDB)
 URL: https://opentdb.com/
 Description: Provides dynamic trivia questions, categories, and difficulties fetched via REST API endpoints.
 
-### 🔐 Required System Permissions
+## 🔐 Required System Permissions
 
 * **Location Services:** Required to fetch coordinates and drop match markers on the arcade statistics map upon finishing a session.
 * **Notifications:** Used to send local notifications and gameplay reminders to players.
 
-### ⚠️ App Limitations
+## ⚠️ App Limitations
 
 * **Active Internet Connection:** *  Required to fetch live trivia question packs from the OpenTDB API during Quiz Rush sessions.
 * **No Authentication:** *  Runs completely locally without user accounts, backend registration, or remote profile cloud sync.
 * **Language Support:** *  English-only interface and trivia data payload.
 
-### 🔊 Credits & Attributions
+## 🔊 Credits & Attributions
 
 * **Game Over Sound Effect:** *  Pixabay Sound Effects
 * **Background & Level Up Music:** *  Free To Use Music
 
-### 🛠️ Requirements & Technical Specs
+## 🛠️ Requirements & Technical Specs
 
 * **IDE:** * Xcode 15.0 or newer
 * **Language:** * Swift 5.9+
 * **Deployment Target:** * iOS 17.0+
 * **Dependencies:** * None (Relies entirely on native system frameworks)
 
-### 📝 Setup Instructions
+## 📝 Setup Instructions
 
 * **Clone or extract the project source code workspace folder onto your macOS disk.** *
 * **Open the project via the Class_Task.xcodeproj file path configuration launcher.** *
@@ -108,7 +118,7 @@ Description: Provides dynamic trivia questions, categories, and difficulties fet
 * **Go to Product > Clean Build Folder (Cmd + Shift + K).** *
 * **Press Run (Cmd + R) to build and start playing!** *
 
-### Reflection
+## Reflection
 
 Taking on this project without any background in Swift was quite a personal challenge. Getting used to a completely new language, syntax and framework (SwiftUI) meant I had to keep solving problems and learning the basics constantly.
 The weekly check ins gave me clear guidance and ongoing feedback. This step-by-step review helped me stay on track and gradually get a better view of Swift best practices.
