@@ -14,38 +14,48 @@ struct LightItUpView: View {
     
     var body: some View {
         ZStack {
-            Color(.systemBackground)
-                .ignoresSafeArea()
+            LinearGradient(
+                colors: [Color(red: 10/255, green: 12/255, blue: 20/255), Color(red: 18/255, green: 24/255, blue: 38/255)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
             VStack(spacing: 20) {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("SCORE")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .fontWeight(.bold)
+                            .foregroundColor(Color.white.opacity(0.65))
                         Text("\(gameManager.score)")
                             .font(.title).bold()
+                            .foregroundColor(.white)
                     }
                     Spacer()
                     VStack(alignment: .center) {
                         Text("LEVEL")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .fontWeight(.bold)
+                            .foregroundColor(Color.white.opacity(0.65))
                         Text("\(gameManager.currentLevel.rawValue)")
                             .font(.title).bold()
                             .foregroundColor(gameManager.currentLevel.glowColor)
+                            .shadow(color: gameManager.currentLevel.glowColor.opacity(0.7), radius: 6)
                     }
                     Spacer()
                     VStack(alignment: .trailing) {
                         Text("TIME")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .fontWeight(.bold)
+                            .foregroundColor(Color.white.opacity(0.65))
                         Text("\(gameManager.timeRemaining)s")
                             .font(.title).bold()
+                            .foregroundColor(gameManager.timeRemaining <= 5 ? .red : .white)
                     }
                 }
                 .padding()
-                .background(Color.white)
+                .background(Color.gray.opacity(0.75))
                 .cornerRadius(15)
                 .padding(.horizontal)
                 
@@ -109,6 +119,7 @@ struct LightItUpView: View {
         }
         .navigationTitle("Light It Up")
         .navigationBarTitleDisplayMode(.inline)
+        .preferredColorScheme(.dark)
         .onAppear {
             gameManager.startGame()
         }
