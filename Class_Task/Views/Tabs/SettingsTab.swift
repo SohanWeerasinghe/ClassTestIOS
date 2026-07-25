@@ -130,8 +130,18 @@ struct SettingsTab: View {
                     
                     // Notifications Card
                     settingsSection(title: "Daily Challenge", icon: "bell.fill", color: .orange) {
-                        Toggle("Daily notification", isOn: $dailyNotificationsEnabled)
-                            .tint(.orange)
+                        Toggle(isOn: $dailyNotificationsEnabled) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Notifications")
+                                    .font(.system(size: 15, weight: .bold))
+                                    .foregroundColor(.white)
+                                
+                                Text(dailyNotificationsEnabled ? "Daily challenge reminders are on" : "Daily challenge reminders are off")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(Color.white.opacity(0.55))
+                            }
+                        }
+                        .tint(.orange)
                         
                         Divider()
                             .background(Color.white.opacity(0.1))
