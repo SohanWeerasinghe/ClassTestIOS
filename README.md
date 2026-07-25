@@ -102,11 +102,11 @@ Notifications (UNUserNotificationCenter): Used to send local notifications and g
 
 ### 📝 Setup Instructions
 
-Clone or extract the project source code workspace folder onto your macOS disk.
-Open the project via the Class_Task.xcodeproj file path configuration launcher.
-Select your designated Simulator instance context environment configuration or your physical deployment device.
-Go to Product > Clean Build Folder (Cmd + Shift + K).
-Press Run (Cmd + R) to build and start playing!
+* **Clone or extract the project source code workspace folder onto your macOS disk.** *
+* **Open the project via the Class_Task.xcodeproj file path configuration launcher.** *
+* **Select your designated Simulator instance context environment configuration or your physical deployment device.** *
+* **Go to Product > Clean Build Folder (Cmd + Shift + K).** *
+* **Press Run (Cmd + R) to build and start playing!** *
 
 ### Reflection
 
