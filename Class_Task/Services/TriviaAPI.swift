@@ -1,8 +1,8 @@
 import Foundation
 
 enum TriviaAPI {
-    static func fetchQuestions(category: QuizCategory, difficulty: QuizDifficulty) async throws -> [Question] {
-        guard let url = questionURL(category: category, difficulty: difficulty) else {
+    static func fetchQuestions(category: QuizCategory, difficulty: QuizDifficulty, amount: Int = 10) async throws -> [Question] {
+        guard let url = questionURL(category: category, difficulty: difficulty, amount: amount) else {
             throw URLError(.badURL)
         }
         
@@ -11,10 +11,11 @@ enum TriviaAPI {
         return decodedResponse.results
     }
     
-    private static func questionURL(category: QuizCategory, difficulty: QuizDifficulty) -> URL? {
+    private static func questionURL(category: QuizCategory, difficulty: QuizDifficulty, amount: Int) -> URL? {
         var components = URLComponents(string: "https://opentdb.com/api.php")
+        let safeAmount = min(max(amount, 1), 50)
         var queryItems = [
-            URLQueryItem(name: "amount", value: "10"),
+            URLQueryItem(name: "amount", value: String(safeAmount)),
             URLQueryItem(name: "type", value: "multiple")
         ]
         

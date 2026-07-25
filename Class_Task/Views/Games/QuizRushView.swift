@@ -6,11 +6,13 @@ struct QuizRushView: View {
     @AppStorage("quizCategory") private var selectedCategoryRawValue: Int = QuizCategory.any.rawValue
     @AppStorage("quizDifficulty") private var selectedDifficultyRawValue: String = QuizDifficulty.any.rawValue
     @AppStorage("quizRandomizeSettings") private var randomizeQuizSettings: Bool = false
+    @AppStorage("quizRushQuestionCount") private var quizRushQuestionCount: Int = 10
     
     @State private var selectedAnswer: String? = nil
     @State private var hasSubmitted: Bool = false
     @State private var activeCategory: QuizCategory = .any
     @State private var activeDifficulty: QuizDifficulty = .any
+    @State private var madeNewHighScore = false
     
     private var selectedCategory: QuizCategory {
         QuizCategory(rawValue: selectedCategoryRawValue) ?? .any
@@ -165,7 +167,7 @@ struct QuizRushView: View {
                 VStack(alignment: .trailing) {
                     Text("QUESTION")
                         .font(.caption).foregroundColor(.secondary)
-                    Text("\(viewModel.currentIndex + 1) of 10")
+                    Text("\(viewModel.currentIndex + 1) of \(viewModel.questions.count)")
                         .font(.title2).bold()
                 }
             }
@@ -236,58 +238,27 @@ struct QuizRushView: View {
     }
     
     private var gameOverView: some View {
-        VStack(spacing: 24) {
-            Text("Round Completed!")
-                .font(.largeTitle).bold()
-            
-            VStack(spacing: 8) {
-                Text("Your Final Score: \(viewModel.score)")
-                    .font(.title3)
-                
-                if viewModel.score > highScore {
-                    Text("New Mode High Score!")
-                        .foregroundColor(.green)
-                        .bold()
-                }
-                
-                Text("Best Stored Score: \(max(viewModel.score, highScore))")
-                    .foregroundColor(.secondary)
-            }
-            .padding()
-            
-            Button(action: {
-                if viewModel.score > highScore {
-                    highScore = viewModel.score
-                }
+        ResultView(
+            title: "Round Completed",
+            score: viewModel.score,
+            bestScore: max(viewModel.score, highScore),
+            isNewHighScore: madeNewHighScore,
+            themeColor: .purple,
+            primaryAction: {
+                saveHighScoreIfNeeded()
+                madeNewHighScore = false
                 startRound()
-            }) {
-                Text("Play Again")
-                    .bold()
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(12)
-            }
-            .padding(.horizontal, 40)
-            
-            Button("Change Setup") {
-                if viewModel.score > highScore {
-                    highScore = viewModel.score
-                }
+            },
+            secondaryActionTitle: "Change Setup",
+            secondaryAction: {
+                saveHighScoreIfNeeded()
+                madeNewHighScore = false
                 viewModel.viewState = .setup
             }
-            .font(.subheadline)
-        }
-        .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .cornerRadius(20)
-        .padding()
-        .shadow(radius: 8)
+        )
         .onAppear {
-            if viewModel.score > highScore {
-                highScore = viewModel.score
-            }
+            madeNewHighScore = viewModel.score > highScore
+            saveHighScoreIfNeeded()
         }
     }
     
@@ -296,9 +267,20 @@ struct QuizRushView: View {
         activeDifficulty = randomizeQuizSettings ? .randomPlayable : selectedDifficulty
         selectedAnswer = nil
         hasSubmitted = false
+        madeNewHighScore = false
         
         Task {
-            await viewModel.fetchQuestions(category: activeCategory, difficulty: activeDifficulty)
+            await viewModel.fetchQuestions(
+                category: activeCategory,
+                difficulty: activeDifficulty,
+                questionCount: quizRushQuestionCount
+            )
+        }
+    }
+    
+    private func saveHighScoreIfNeeded() {
+        if viewModel.score > highScore {
+            highScore = viewModel.score
         }
     }
     

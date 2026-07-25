@@ -1,7 +1,7 @@
 import SwiftUI
 import MapKit
 
-struct GameMapView: View {
+struct MapTab: View {
     @StateObject private var locationService = LocationService.shared
     @StateObject private var sessionStore = GameSessionStore.shared
     
@@ -206,6 +206,6 @@ struct MapSessionCard: View {
 
 #Preview {
     NavigationStack {
-        GameMapView()
+        MapTab()
     }
 }

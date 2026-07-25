@@ -8,7 +8,7 @@
 import SwiftUI
 import AVFoundation
 
-struct Homepage: View {
+struct HomeTab: View {
     @State private var backgroundMusicPlayer: AVAudioPlayer?
     
     var body: some View {
@@ -41,15 +41,15 @@ struct Homepage: View {
                         
                         VStack(spacing: 20) {
                             NavigationLink(destination: LoadingScreen()) {
-                                GameMenuCard(title: "Tap Me!",
+                                GameMenuCard(title: "Tap Frenzy!",
                                              subtitle: "Test your speed clicking skills",
                                              icon: "hand.tap.fill",
                                              color: .orange)
                             }
                             
-                            NavigationLink(destination: LightUpLoadingScreen()) {
+                            NavigationLink(destination: LightItUpView()) {
                                 GameMenuCard(title: "Light It Up",
-                                             subtitle: "Your brilliant next project",
+                                             subtitle: "Click the lighted up squere as fast as you can!",
                                              icon: "inset.filled.square",
                                              color: .green)
                             }
@@ -67,19 +67,19 @@ struct Homepage: View {
                         
                         Spacer()
                     }
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            NavigationLink(destination: LeaderboardView()) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "trophy.fill")
-                                    Text("Scores")
-                                }
-                                .font(.subheadline)
-                                .bold()
-                                .foregroundColor(.orange)
-                            }
-                        }
-                    }
+//                    .toolbar {
+//                        ToolbarItem(placement: .navigationBarTrailing) {
+//                            NavigationLink(destination: StatsTab()) {
+//                                HStack(spacing: 4) {
+//                                    Image(systemName: "trophy.fill")
+//                                    Text("Scores")
+//                                }
+//                                .font(.subheadline)
+//                                .bold()
+//                                .foregroundColor(.orange)
+//                            }
+//                        }
+//                    }
                 }
                 .onAppear {
                     playBackgroundMusic()
@@ -94,7 +94,7 @@ struct Homepage: View {
             }
             
             NavigationStack {
-                LeaderboardView()
+                StatsTab()
             }
             .tabItem {
                 Image(systemName: "chart.bar.fill")
@@ -102,7 +102,7 @@ struct Homepage: View {
             }
             
             NavigationStack {
-                GameMapView()
+                MapTab()
             }
             .tabItem {
                 Image(systemName: "map.fill")
@@ -110,7 +110,7 @@ struct Homepage: View {
             }
             
             NavigationStack {
-                SettingsView()
+                SettingsTab()
             }
             .tabItem {
                 Image(systemName: "gearshape.fill")
@@ -214,5 +214,5 @@ struct GameMenuCard: View {
 }
 
 #Preview {
-    Homepage()
+    HomeTab()
 }

@@ -1,8 +1,9 @@
 import SwiftUI
 
-struct LightUpLoadingScreen: View {
+struct LightItUpView: View {
     @StateObject private var gameManager = LightUpGameManager()
     @AppStorage("lightUpHighScore") private var highScore: Int = 0
+    @State private var madeNewHighScore = false
     
     var body: some View {
         ZStack {
@@ -69,44 +70,17 @@ struct LightUpLoadingScreen: View {
                     }
                     .padding(24)
                 } else {
-                    VStack(spacing: 16) {
-                        Text("Game Over 🏁")
-                            .font(.largeTitle)
-                            .bold()
-                        
-                        Text("Final Score: \(gameManager.score)")
-                            .font(.title2)
-                        
-                        if gameManager.score > highScore {
-                            Text("🎉 New High Score! 🎉")
-                                .foregroundColor(.green)
-                                .bold()
-                        }
-                        
-                        Text("Best Score: \(max(gameManager.score, highScore))")
-                            .foregroundColor(.secondary)
-                        
-                        Button(action: {
-                            if gameManager.score > highScore {
-                                highScore = gameManager.score
-                            }
-                            gameManager.startGame()
-                        }) {
-                            Text("Play Again")
-                                .bold()
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Color.blue)
-                                .cornerRadius(12)
-                        }
-                        .padding(.horizontal, 40)
+                    ResultView(
+                        title: "Game Over",
+                        score: gameManager.score,
+                        bestScore: max(gameManager.score, highScore),
+                        isNewHighScore: madeNewHighScore,
+                        themeColor: gameManager.currentLevel.glowColor
+                    ) {
+                        saveHighScoreIfNeeded()
+                        madeNewHighScore = false
+                        gameManager.startGame()
                     }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
-                    .padding()
                 }
                 
                 Spacer()
@@ -131,20 +105,25 @@ struct LightUpLoadingScreen: View {
             gameManager.startGame()
         }
         .onChange(of: gameManager.isGameOver) {
-            if gameManager.isGameOver && gameManager.score > highScore {
-                highScore = gameManager.score
+            if gameManager.isGameOver {
+                madeNewHighScore = gameManager.score > highScore
+                saveHighScoreIfNeeded()
             }
         }
         .onDisappear {
-            if gameManager.score > highScore {
-                highScore = gameManager.score
-            }
+            saveHighScoreIfNeeded()
+        }
+    }
+    
+    private func saveHighScoreIfNeeded() {
+        if gameManager.score > highScore {
+            highScore = gameManager.score
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        LightUpLoadingScreen()
+        LightItUpView()
     }
 }

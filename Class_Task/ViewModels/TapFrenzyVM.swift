@@ -4,7 +4,7 @@ import AVFoundation
 
 class TapFrenzyVM: ObservableObject {
     @Published var score: Int = 0
-    @Published var timeRemaining: Int = 10
+    @Published var timeRemaining: Int = TapFrenzyVM.storedGameDuration
     @Published var isGameOver: Bool = false
     @Published var currentColor: Color = .blue
     @Published var isDangerTarget: Bool = false
@@ -20,6 +20,11 @@ class TapFrenzyVM: ObservableObject {
     private var hasTappedThisSecond: Bool = false
     private var dangerResetTask: DispatchWorkItem?
     private var audioPlayer: AVAudioPlayer?
+    
+    private static var storedGameDuration: Int {
+        let duration = UserDefaults.standard.integer(forKey: "tapFrenzyDuration")
+        return duration > 0 ? duration : 10
+    }
     
     func handleTargetTap(in size: CGSize) {
         if isDangerTarget {
@@ -89,7 +94,7 @@ class TapFrenzyVM: ObservableObject {
         dangerResetTask?.cancel()
         dangerResetTask = nil
         score = 0
-        timeRemaining = 10
+        timeRemaining = Self.storedGameDuration
         currentColor = .blue
         isDangerTarget = false
         isGameOver = false

@@ -26,7 +26,7 @@ class QuizRushViewModel: ObservableObject {
     
     @Published var feedbackColor: Color = .clear
     
-    func fetchQuestions(category: QuizCategory, difficulty: QuizDifficulty) async {
+    func fetchQuestions(category: QuizCategory, difficulty: QuizDifficulty, questionCount: Int = 10) async {
         await MainActor.run {
             self.viewState = .loading
             self.currentIndex = 0
@@ -37,7 +37,7 @@ class QuizRushViewModel: ObservableObject {
         }
         
         do {
-            let loadedQuestions = try await TriviaAPI.fetchQuestions(category: category, difficulty: difficulty)
+            let loadedQuestions = try await TriviaAPI.fetchQuestions(category: category, difficulty: difficulty, amount: questionCount)
             
             await MainActor.run {
                 if !loadedQuestions.isEmpty {

@@ -56,7 +56,7 @@ class LightUpGameManager: ObservableObject {
     @Published var currentLevel: GameLevel = .L1
     @Published var score: Int = 0
     @Published var lives: Int = 3
-    @Published var timeRemaining: Int = 60
+    @Published var timeRemaining: Int = LightUpGameManager.storedGameDuration
     @Published var isGameOver: Bool = false
     @Published var showLevelUpFlash: Bool = false
     
@@ -64,11 +64,18 @@ class LightUpGameManager: ObservableObject {
     private var gameTimer: AnyCancellable?
     private var lightWindowTimer: AnyCancellable?
     private var roundTimeElapsed: Int = 0
+    private var sessionDuration: Int = LightUpGameManager.storedGameDuration
+    
+    private static var storedGameDuration: Int {
+        let duration = UserDefaults.standard.integer(forKey: "lightItUpDuration")
+        return duration > 0 ? duration : 60
+    }
     
     func startGame() {
         score = 0
         lives = 3
-        timeRemaining = 60
+        sessionDuration = Self.storedGameDuration
+        timeRemaining = sessionDuration
         roundTimeElapsed = 0
         currentLevel = .L1
         isGameOver = false
@@ -151,11 +158,13 @@ class LightUpGameManager: ObservableObject {
     private func checkLevelProgression() {
         let newLevel: GameLevel
         
-        if roundTimeElapsed < 15 {
+        let quarterDuration = max(1, sessionDuration / 4)
+        
+        if roundTimeElapsed < quarterDuration {
             newLevel = .L1
-        } else if roundTimeElapsed < 30 {
+        } else if roundTimeElapsed < quarterDuration * 2 {
             newLevel = .L2
-        } else if roundTimeElapsed < 45 {
+        } else if roundTimeElapsed < quarterDuration * 3 {
             newLevel = .L3
         } else {
             newLevel = .L4

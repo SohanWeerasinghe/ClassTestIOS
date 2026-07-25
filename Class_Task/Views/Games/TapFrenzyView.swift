@@ -1,7 +1,7 @@
 import SwiftUI
 import Combine
 
-struct ContentView: View {
+struct TapFrenzyView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel = TapFrenzyVM()
     
@@ -113,55 +113,17 @@ struct ContentView: View {
                     .ignoresSafeArea()
                     .transition(.opacity)
                 
-                VStack(spacing: 24) {
-                    Text("GAME OVER 🕹️")
-                        .font(.system(size: 32, weight: .black, design: .rounded))
-                        .foregroundColor(.red)
-                    
-                    VStack(spacing: 8) {
-                        Text("Final Score")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Text("\(viewModel.score)")
-                            .font(.system(size: 48, weight: .bold))
-                            .foregroundColor(.primary)
-                        
-                        if viewModel.isNewHighScore {
-                            Text("🎉 New High Score! 🎉")
-                                .font(.subheadline)
-                                .foregroundColor(.green)
-                                .bold()
-                                .padding(.top, 4)
-                        } else {
-                            Text("Best Score: \(viewModel.highScore)")
-                                .font(.footnote)
-                                .foregroundColor(.secondary)
-                        }
+                ResultView(
+                    title: "Game Over",
+                    score: viewModel.score,
+                    bestScore: viewModel.highScore,
+                    isNewHighScore: viewModel.isNewHighScore,
+                    themeColor: .blue
+                ) {
+                    withAnimation(.spring()) {
+                        viewModel.resetGame()
                     }
-                    .padding(.vertical, 12)
-                    
-                    Button(action: {
-                        withAnimation(.spring()) {
-                            viewModel.resetGame()
-                        }
-                    }) {
-                        Text("Play Again")
-                            .font(.headline)
-                            .bold()
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue.gradient)
-                            .cornerRadius(14)
-                            .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
-                    }
-                    .padding(.horizontal, 20)
                 }
-                .padding(30)
-                .background(Color(.systemBackground))
-                .cornerRadius(24)
-                .shadow(radius: 20)
-                .padding(.horizontal, 36)
                 .transition(.scale(scale: 0.85).combined(with: .opacity))
             }
         }
@@ -219,30 +181,16 @@ struct ContentView: View {
 
 extension Color {
     init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3:
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6:
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 7:
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (1, 1, 1, 1)
-        }
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
+        let cleanHex = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+        var rgbValue: UInt64 = 0
+        Scanner(string: cleanHex).scanHexInt64(&rgbValue)
+        let red = Double((rgbValue & 0xFF0000) >> 16) / 255.0
+        let green = Double((rgbValue & 0x00FF00) >> 8) / 255.0
+        let blue = Double(rgbValue & 0x0000FF) / 255.0
+        self.init(.sRGB, red: red, green: green, blue: blue, opacity: 1.0)
     }
 }
 
 #Preview {
-    ContentView()
+    TapFrenzyView()
 }

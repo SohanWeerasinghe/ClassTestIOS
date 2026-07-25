@@ -80,13 +80,14 @@ class GameSessionStore: ObservableObject {
     
     private func loadSessions() {
         guard let data = UserDefaults.standard.data(forKey: storageKey) else { return }
-        
+        //binary to swift
         if let decodedSessions = try? JSONDecoder().decode([GameSession].self, from: data) {
             sessions = decodedSessions
         }
     }
     
     private func saveSessions() {
+        //binary format transfer
         if let encodedSessions = try? JSONEncoder().encode(sessions) {
             UserDefaults.standard.set(encodedSessions, forKey: storageKey)
         }

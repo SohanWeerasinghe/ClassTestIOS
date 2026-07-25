@@ -13,7 +13,7 @@ struct LoadingScreen: View {
         NavigationStack {
             ZStack {
                 Image("loadingIMG")
-                    .resizable()
+                    .resizable() 
                     .scaledToFill()
                     .ignoresSafeArea()
                 
@@ -32,7 +32,7 @@ struct LoadingScreen: View {
                 }
             }
             .navigationDestination(isPresented: $navigateToGame) {
-                ContentView()
+                TapFrenzyView()
                     .navigationBarBackButtonHidden(true)
             }
         }

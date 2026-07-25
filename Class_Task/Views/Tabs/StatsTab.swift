@@ -1,7 +1,7 @@
 import SwiftUI
 import Charts
 
-struct LeaderboardView: View {
+struct StatsTab: View {
     @AppStorage("tapMeHighScore") private var tapMeHighScore: Int = 0
     @AppStorage("lightUpHighScore") private var lightUpHighScore: Int = 0
     @AppStorage("quizRushHighScore") private var quizRushHighScore: Int = 0
@@ -105,7 +105,7 @@ struct LeaderboardView: View {
                         
                         VStack(spacing: 12) {
                             if statsVM.selectedFilter == .all || statsVM.selectedFilter == .tapMe {
-                                LeaderboardCard(
+                                ScoreBadge(
                                     gameTitle: GameMode.tapMe.title,
                                     highScore: tapMeHighScore,
                                     icon: GameMode.tapMe.icon,
@@ -114,7 +114,7 @@ struct LeaderboardView: View {
                             }
                             
                             if statsVM.selectedFilter == .all || statsVM.selectedFilter == .lightItUp {
-                                LeaderboardCard(
+                                ScoreBadge(
                                     gameTitle: GameMode.lightItUp.title,
                                     highScore: lightUpHighScore,
                                     icon: GameMode.lightItUp.icon,
@@ -123,7 +123,7 @@ struct LeaderboardView: View {
                             }
                             
                             if statsVM.selectedFilter == .all || statsVM.selectedFilter == .quizRush {
-                                LeaderboardCard(
+                                ScoreBadge(
                                     gameTitle: GameMode.quizRush.title,
                                     highScore: quizRushHighScore,
                                     icon: GameMode.quizRush.icon,
@@ -187,54 +187,9 @@ struct LeaderboardView: View {
     }
 }
 
-struct LeaderboardCard: View {
-    let gameTitle: String
-    let highScore: Int
-    let icon: String
-    let themeColor: Color
-    
-    var body: some View {
-        HStack(spacing: 20) {
-            Image(systemName: icon)
-                .font(.system(size: 30))
-                .foregroundColor(.white)
-                .frame(width: 70, height: 70)
-                .background(themeColor)
-                .cornerRadius(15)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(gameTitle)
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(.black)
-                
-                Text("Personal Best")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("\(highScore)")
-                    .font(.system(size: 30, weight: .black, design: .rounded))
-                    .foregroundColor(themeColor)
-                
-                Text("pts")
-                    .font(.caption2)
-                    .bold()
-                    .foregroundColor(.gray)
-            }
-        }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(18)
-        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
-    }
-}
 
 #Preview {
     NavigationStack {
-        LeaderboardView()
+        StatsTab()
     }
 }

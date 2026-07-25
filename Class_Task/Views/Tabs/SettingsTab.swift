@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SettingsView: View {
+struct SettingsTab: View {
     @AppStorage("quizCategory") private var quizCategoryRawValue: Int = QuizCategory.any.rawValue
     @AppStorage("quizDifficulty") private var quizDifficultyRawValue: String = QuizDifficulty.any.rawValue
     @AppStorage("quizRandomizeSettings") private var randomizeQuizSettings: Bool = false
@@ -10,6 +10,10 @@ struct SettingsView: View {
     @AppStorage("dailyChallengeMinute") private var dailyChallengeMinute: Int = 0
     @AppStorage("dailyChallengeCategory") private var dailyChallengeCategoryRawValue: Int = QuizCategory.any.rawValue
     @AppStorage("dailyChallengeDifficulty") private var dailyChallengeDifficultyRawValue: String = QuizDifficulty.any.rawValue
+    
+    @AppStorage("tapFrenzyDuration") private var tapFrenzyDuration: Int = 10
+    @AppStorage("lightItUpDuration") private var lightItUpDuration: Int = 60
+    @AppStorage("quizRushQuestionCount") private var quizRushQuestionCount: Int = 10
     
     @AppStorage("tapMeHighScore") private var tapMeHighScore: Int = 0
     @AppStorage("lightUpHighScore") private var lightUpHighScore: Int = 0
@@ -42,7 +46,7 @@ struct SettingsView: View {
                             .foregroundColor(.black)
                             .fontDesign(.serif)
                         
-                        Text("Quiz setup and daily challenge reminders")
+                        Text("Quiz setup, game sessions and reminders")
                             .font(.subheadline)
                             .foregroundColor(.black)
                     }
@@ -64,6 +68,12 @@ struct SettingsView: View {
                             }
                         }
                         .disabled(randomizeQuizSettings)
+                    }
+                    
+                    settingsSection(title: "Game Sessions", icon: "timer", color: .blue) {
+                        Stepper("Tap Frenzy: \(tapFrenzyDuration) seconds", value: $tapFrenzyDuration, in: 5...60, step: 5)
+                        Stepper("Light It Up: \(lightItUpDuration) seconds", value: $lightItUpDuration, in: 30...180, step: 15)
+                        Stepper("Quiz Rush: \(quizRushQuestionCount) questions", value: $quizRushQuestionCount, in: 5...20, step: 5)
                     }
                     
                     settingsSection(title: "Daily Challenge", icon: "bell.fill", color: .orange) {
@@ -234,6 +244,6 @@ struct SettingsView: View {
 
 #Preview {
     NavigationStack {
-        SettingsView()
+        SettingsTab()
     }
 }
