@@ -20,7 +20,6 @@
 
 ## 📁 Folder Structure
 
-```text
 Class_Task/
 ├── App/
 │   └── Class_TaskApp.swift
@@ -57,18 +56,20 @@ Class_Task/
 
 ###🗺️ Extended Framework Functions
 
-🏆 Stats & Interactive Analytics Dashboard: Integrated with custom SwiftUI Charts layouts. Features filtering options to view total matches played, absolute maximum records, historical performance bar graphs (BarMark), and a historical match timeline.
+* **🏆 Stats & Interactive Analytics Dashboard:** * Integrated with custom SwiftUI Charts layouts. Features filtering options to view total matches played, absolute maximum records, historical performance bar graphs (BarMark), and a historical match timeline.
 
-📍 Game Map Pinning Engine: Utilizes Apple's native MapKit and CoreLocation hardware frameworks. Automatically asks for authorization upon initialization (requestWhenInUseAuthorization). Dropping an arcade pin (Marker) displays specific game descriptions, date timestamps, exact score properties, and signal radius details (horizontalAccuracy).
+* **📍 Game Map Pinning Engine:** * Utilizes Apple's native MapKit and CoreLocation hardware frameworks. Automatically asks for authorization upon initialization (requestWhenInUseAuthorization). Dropping an arcade pin (Marker) displays specific game descriptions, date timestamps, exact score properties, and signal radius details (horizontalAccuracy).
 
-🎵 Media System & Audio Pipeline: Built using AVFoundation. Runs background ambient loops that handle interruptions gracefully alongside other apps.
+* **🎵 Media System & Audio Pipeline:** * Built using AVFoundation. Runs background ambient loops that handle interruptions gracefully alongside other apps.
 
 ###🏗️ Architectural Overview (MVVM)
 
 The app follows standard development separation concepts to keep logic decoupleable and easy to maintain:
-Models: Strongly-typed structs conforming to Codable and Identifiable for parsing server responses cleanly.
-ViewModels: ObservableObject controllers utilizing @Published state tracking variables. Marked with @MainActor keywords to guarantee thread-safe layout operations away from background threads.
-Views: Structural layers parsing system properties via standard bindings (@StateObject, @AppStorage, and @Environment).
+
+* **Models:** * Strongly-typed structs conforming to Codable and Identifiable for parsing server responses cleanly.
+* **ViewModels:** * ObservableObject controllers utilizing @Published state tracking variables. Marked with @MainActor keywords to guarantee 
+thread-safe layout operations away from background threads.
+* **Views:** * Structural layers parsing system properties via standard bindings (@StateObject, @AppStorage, and @Environment).
 
 ###🌐 External APIs Used
 
@@ -83,21 +84,21 @@ Notifications (UNUserNotificationCenter): Used to send local notifications and g
 
 ###⚠️ App Limitations
 
-Active Internet Connection: Required to fetch live trivia question packs from the OpenTDB API during Quiz Rush sessions.
-No Authentication: Runs completely locally without user accounts, backend registration, or remote profile cloud sync.
-Language Support: English-only interface and trivia data payload.
+* **Active Internet Connection:** *  Required to fetch live trivia question packs from the OpenTDB API during Quiz Rush sessions.
+* **No Authentication:** *  Runs completely locally without user accounts, backend registration, or remote profile cloud sync.
+* **Language Support:** *  English-only interface and trivia data payload.
 
 ###🔊 Credits & Attributions
 
-Game Over Sound Effect: Pixabay Sound Effects
-Background & Level Up Music: Free To Use Music
+* **Game Over Sound Effect:** *  Pixabay Sound Effects
+* **Background & Level Up Music:** *  Free To Use Music
 
 ###🛠️ Requirements & Technical Specs
 
-IDE: Xcode 15.0 or newer
-Language: Swift 5.9+
-Deployment Target: iOS 17.0+
-Dependencies: None (Relies entirely on native system frameworks)
+* **IDE:** * Xcode 15.0 or newer
+* **Language:** * Swift 5.9+
+* **Deployment Target:** * iOS 17.0+
+* **Dependencies:** * None (Relies entirely on native system frameworks)
 
 ###📝 Setup Instructions
 
