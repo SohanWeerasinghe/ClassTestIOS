@@ -79,8 +79,8 @@ Description: Provides dynamic trivia questions, categories, and difficulties fet
 
 ### 🔐 Required System Permissions
 
-Location Services (NSLocationWhenInUseUsageDescription): Required to fetch coordinates and drop match markers on the arcade statistics map upon finishing a session.
-Notifications (UNUserNotificationCenter): Used to send local notifications and gameplay reminders to players.
+* **Location Services:** Required to fetch coordinates and drop match markers on the arcade statistics map upon finishing a session.
+* **Notifications:** Used to send local notifications and gameplay reminders to players.
 
 ### ⚠️ App Limitations
 
