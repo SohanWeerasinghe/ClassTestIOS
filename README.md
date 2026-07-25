@@ -62,14 +62,12 @@ Class_Task/
   * **⚡ Tap Frenzy:** Fast-paced reaction challenge with dynamic combo multipliers.
   * **💡 Light It Up:** Reflex-testing grid matrix with scaling difficulty levels (`L1`–`L4`).
   * **🧠 Quiz Rush:** Real-time trivia powered by asynchronous REST API calls.
-* **👤 Customizable Player Profile:** Personalize your arcade identity with custom usernames and avatars.
-* **🪙 In-Game Economy:** Earn coins through gameplay to unlock new avatars in the shop.
 * **📅 Daily Challenge System:** Complete daily tasks with automated local push notification reminders (`UNUserNotificationCenter`).
 * **📊 Statistics & Performance Dashboard:** Detailed analytics to track total matches played, high scores, and performance history using `SwiftUI Charts`.
 * **🗺️ MapKit Province Exploration:** Interactive location-based engine using `CoreLocation` and `MapKit` to pin played game sessions and explore discovered provinces.
 * **🎵 Dynamic Audio Pipeline:** Features background music loops and responsive sound effects (`AVFoundation`).
-* **💾 Local Data Persistence:** Instant, offline data saving for game sessions, high scores, coins, and settings using `UserDefaults` and `@AppStorage`.
-* **🎨 Modern Responsive UI:** Built completely with SwiftUI following the **MVVM** software architecture pattern for clean, thread-safe UI updates.
+* **💾 Local Data Persistence:** Instant, offline data saving for game sessions, high scores, and settings using `UserDefaults` and `@AppStorage`.
+* **🎨 Modern Responsive UI:** Built completely with SwiftUI following the **MVVM** software architecture pattern for clean, UI updates.
 * **🔗 Score Sharing:** Generate sharable links to boast high scores and challenge friends.
 
 ## 🏗️ Architectural Overview (MVVM)
